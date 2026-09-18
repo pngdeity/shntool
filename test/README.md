@@ -6,12 +6,15 @@ Four layers:
 |---|---|---|
 | `test/unit/` (Unity) | no | Unit tests for pure helpers: endian conversion, bounded string copies, module helpers, WAVE header construction, and split-point parsing. |
 | `test/smoke.py` | no | Runs core modes against generated fixtures and checks structural expectations. |
-| `test/differential.py` | yes | Runs candidate and reference binaries over the same fixtures and compares exit code, stdout, stderr, and every produced file (SHA-256). |
+| `test/differential.py` | yes | Runs candidate and reference binaries over the same fixtures and compares exit code, stdout, stderr, and every produced file (SHA-256). Covers every mode, encoded-format round-trips, negative/error paths and RIFF edge cases. |
 | `test/fuzz/` (libFuzzer) | no | Coverage-guided fuzzing of the WAVE header parser, the ID3v2 tag detector and the CUE-sheet tokenizer, run for a bounded number of iterations each as regression tests. |
 
-Fixtures are generated deterministically by `test/tools/gen_fixtures.py` using
-only the Python standard library, so they are independent of the program under
-test and reproducible byte-for-byte.
+Base fixtures are generated deterministically by `test/tools/gen_fixtures.py`
+using only the Python standard library, so they are independent of the program
+under test and reproducible byte-for-byte. `test/tools/make_format_fixtures.py`
+additionally encodes them into `flac`, `ape` and `aiff` with the external
+`flac`, `mac` and `sox` helpers; differential cases that need a helper skip
+themselves when it is not installed.
 
 The unit tests use [Unity](https://github.com/ThrowTheSwitch/Unity), pulled in
 through the Meson wrap in `subprojects/unity.wrap`. The first configure needs
@@ -69,6 +72,18 @@ LeakSanitizer reports lost allocations, so the sanitized test run also guards
 against memory leaks. Leak detection is disabled only for the fuzzer process
 itself, whose error paths intentionally abandon state.
 
+## Static analysis
+
+`clang-tidy` runs over the Meson compilation database with the checks selected
+in `.clang-tidy`: the Clang static analyzer, with core, security and unix
+findings treated as errors. It needs a `compile_commands.json`, which Meson
+generates at configure time:
+
+```sh
+meson setup build
+run-clang-tidy -p build
+```
+
 ## Building an upstream reference
 
 The pristine 3.0.10 tree is preserved under the `upstream-3.0.10` tag. It does
@@ -88,6 +103,16 @@ make
 
 Append a `(name, argv)` tuple to `CASES` in `test/differential.py`. Cases must
 be non-interactive: pass `-P none` to suppress progress output and prefer a
-`-a`/`-z` output prefix so fixtures are never overwritten. Dependency-bearing
-formats (flac, wavpack, ape, ...) are intentionally not part of the default
-corpus, which uses only `wav` so it runs without external helper programs.
+`-a`/`-z` output prefix so fixtures are never overwritten.
+
+Cases whose fixtures come from an external helper (flac, ape, aiff) are added
+through the `_add(name, argv, format)` helper, which records the required
+format in `CASE_REQUIRES`; the case is skipped when that helper is unavailable
+instead of failing. The suite already covers read/write round-trips for each
+encoded format, malformed options and missing inputs, and RIFF edge cases
+(ID3v2-prefixed files, extra and trailing chunks, odd-sized data).
+
+Because shntool does not wait for its output encoder subprocess (the unused
+`close_and_wait()` in upstream), the harness only snapshots a working tree once
+it has stopped changing (`stable_snapshot`). This keeps the comparison
+deterministic without hiding behavioral differences.

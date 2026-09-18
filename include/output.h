@@ -24,13 +24,20 @@
 #ifndef __OUTPUT_H__
 #define __OUTPUT_H__
 
-void st_output(char *, ...);
-void st_info(char *, ...);
-void st_warning(char *, ...);
-void st_error(char *, ...);
-void st_help(char *, ...);
-void st_debug1(char *, ...);
-void st_debug2(char *, ...);
-void st_debug3(char *, ...);
+#if defined(__GNUC__) || defined(__clang__)
+#define ST_PRINTF_FORMAT(fmt_idx, first_arg)                                   \
+  __attribute__((format(printf, fmt_idx, first_arg)))
+#else
+#define ST_PRINTF_FORMAT(fmt_idx, first_arg)
+#endif
+
+void st_output(char *, ...) ST_PRINTF_FORMAT(1, 2);
+void st_info(char *, ...) ST_PRINTF_FORMAT(1, 2);
+void st_warning(char *, ...) ST_PRINTF_FORMAT(1, 2);
+void st_error(char *, ...) ST_PRINTF_FORMAT(1, 2);
+void st_help(char *, ...) ST_PRINTF_FORMAT(1, 2);
+void st_debug1(char *, ...) ST_PRINTF_FORMAT(1, 2);
+void st_debug2(char *, ...) ST_PRINTF_FORMAT(1, 2);
+void st_debug3(char *, ...) ST_PRINTF_FORMAT(1, 2);
 
 #endif

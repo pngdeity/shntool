@@ -977,7 +977,7 @@ int close_and_wait(FILE *fd, proc_info *pinfo, int child_type,
   }
   st_strlcat(debuginfo, "]", BUF_SIZE);
 
-  st_debug2(debuginfo);
+  st_debug2("%s", debuginfo);
 #endif
 
 #ifdef WIN32
@@ -1773,7 +1773,7 @@ void input_read_all_files() {
       st_error("filename duplication failed");
     st_input.filemax++;
     if (st_input.filemax >= MAX_FILENAMES)
-      st_error("exceeded maximum number of filenames: [%s]", MAX_FILENAMES);
+      st_error("exceeded maximum number of filenames: [%d]", MAX_FILENAMES);
   }
 
   st_input.type = INPUT_INTERNAL;

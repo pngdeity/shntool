@@ -165,7 +165,7 @@ bool verify_wav_header_internal(wave_info *info, bool verbose)
       if (fread(buf, 1, 1, info->input) != 1) {
         st_warning("reached end of file when jumping ahead %lu bytes during "
                    "search for fmt tag while processing file: [%s]",
-                   info->filename, le_long);
+                   le_long, info->filename);
         return FALSE;
       }
       bytes--;
@@ -307,8 +307,13 @@ bool verify_wav_header_internal(wave_info *info, bool verbose)
   info->extra_riff_size =
       info->total_size - (info->padded_data_size + info->header_size);
 
-  info->length = info->data_size / info->rate;
-  info->exact_length = (double)info->data_size / (double)info->rate;
+  if (info->rate > 0) {
+    info->length = info->data_size / info->rate;
+    info->exact_length = (double)info->data_size / (double)info->rate;
+  } else {
+    info->length = 0;
+    info->exact_length = 0.0;
+  }
 
   if (info->channels == CD_CHANNELS &&
       info->bits_per_sample == CD_BITS_PER_SAMPLE &&
@@ -331,7 +336,7 @@ bool verify_wav_header_internal(wave_info *info, bool verbose)
   if (info->data_size > info->total_size - (wlong)info->header_size)
     info->problems |= PROBLEM_HEADER_INCONSISTENT;
 
-  if ((info->data_size % info->block_align) != 0)
+  if ((0 != info->block_align) && ((info->data_size % info->block_align) != 0))
     info->problems |= PROBLEM_DATA_NOT_ALIGNED;
 
   if (info->input_format && !info->input_format->is_compressed &&
@@ -453,7 +458,7 @@ wave_info *new_wave_info(char *filename)
       st_strlcat(msg, "+ this file may be unsupported, truncated or corrupt",
                  BUF_SIZE);
 
-      st_warning(msg);
+      st_warning("%s", msg);
 
       goto invalid_wave_data;
     }
@@ -492,12 +497,12 @@ wave_info *new_wave_info(char *filename)
     }
 
     if (info->file_has_id3v2_tag)
-      st_debug1("after skipping %d-byte ID3v2 tag, found %d-byte magic header "
-                "0x%08X [%s] in file: [%s]",
+      st_debug1("after skipping %lu-byte ID3v2 tag, found %d-byte magic header "
+                "0x%08lX [%s] in file: [%s]",
                 info->id3v2_tag_size, i, uchar_to_ulong_be(buf), buf,
                 info->filename);
     else
-      st_debug1("found %d-byte magic header 0x%08X [%s] in file: [%s]", i,
+      st_debug1("found %d-byte magic header 0x%08lX [%s] in file: [%s]", i,
                 uchar_to_ulong_be(buf), buf, info->filename);
 
     fclose(f);

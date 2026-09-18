@@ -42,7 +42,7 @@ static void cmp_help() {
   st_info("Mode-specific options:\n");
   st_info("\n");
   st_info("  -c secs check the first secs seconds of data for byte shift "
-          "(default is %d)\n",
+          "(default is %lu)\n",
           shift_secs);
   st_info("  -f fuzz fuzz factor: allow up to fuzz mismatches when detecting a "
           "byte-shift\n");
@@ -177,7 +177,7 @@ static bool cmp_files(wave_info *info1, wave_info *info2, int shift) {
   /* kluge to work around free(buf2) dumping core if malloc()'d separately */
   if (NULL == (buf1 = malloc(2 * xfer_size * sizeof(unsigned char)))) {
     prog_error(&proginfo);
-    st_error("could not allocate %d-byte comparison buffer", xfer_size);
+    st_error("could not allocate %lu-byte comparison buffer", xfer_size);
   }
 
   buf2 = buf1 + xfer_size;
@@ -317,7 +317,7 @@ static bool shift_comparison(wave_info *info1, wave_info *info2) {
 
   if (NULL == (buf1 = malloc(2 * bytes * sizeof(unsigned char)))) {
     prog_error(&proginfo);
-    st_error("could not allocate %d-byte comparison buffer", bytes);
+    st_error("could not allocate %lu-byte comparison buffer", bytes);
   }
 
   buf2 = buf1 + bytes;
@@ -405,7 +405,7 @@ static bool process_files(char *filename1, char *filename2) {
 }
 
 static bool process(int argc, char **argv, int start) {
-  char *filename1, *filename2;
+  char *filename1 = NULL, *filename2 = NULL;
   bool success;
 
   success = FALSE;

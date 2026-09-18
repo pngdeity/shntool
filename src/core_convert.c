@@ -24,8 +24,8 @@ CVSID("$Id: core_convert.c,v 1.21 2009/03/11 17:18:01 jason Exp $")
 unsigned long uchar_to_ulong_le(unsigned char *buf)
 /* converts 4 bytes stored in little-endian format to an unsigned long */
 {
-  return (unsigned long)(buf[0] | (buf[1] << 8) | (buf[2] << 16) |
-                         (buf[3] << 24));
+  return ((unsigned long)buf[0] | ((unsigned long)buf[1] << 8) |
+          ((unsigned long)buf[2] << 16) | ((unsigned long)buf[3] << 24));
 }
 
 unsigned short uchar_to_ushort_le(unsigned char *buf)
@@ -53,8 +53,8 @@ void ushort_to_uchar_le(unsigned char *buf, unsigned short num)
 unsigned long uchar_to_ulong_be(unsigned char *buf)
 /* converts 4 bytes stored in big-endian format to an unsigned long */
 {
-  return (unsigned long)((buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) |
-                         buf[3]);
+  return (((unsigned long)buf[0] << 24) | ((unsigned long)buf[1] << 16) |
+          ((unsigned long)buf[2] << 8) | (unsigned long)buf[3]);
 }
 
 unsigned short uchar_to_ushort_be(unsigned char *buf)

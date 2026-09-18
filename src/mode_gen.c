@@ -142,7 +142,7 @@ static bool process() {
 
     if (write_n_bytes(output, silence, bytes, &proginfo) != bytes) {
       prog_error(&proginfo);
-      st_error("error while writing %d-byte chunk of silence", bytes);
+      st_error("error while writing %lu-byte chunk of silence", bytes);
     }
 
     bytes_left -= bytes;

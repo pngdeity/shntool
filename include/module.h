@@ -101,7 +101,7 @@ char *basename(char *);
 char *extname(char *);
 
 /* replacement snprintf */
-void st_snprintf(char *, int, char *, ...);
+void st_snprintf(char *, int, char *, ...) ST_PRINTF_FORMAT(3, 4);
 
 /* bounded, always-NUL-terminating string copy and concatenation */
 size_t st_strlcpy(char *, const char *, size_t);

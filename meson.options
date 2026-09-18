@@ -1,0 +1,10 @@
+option('modes', type: 'string',
+  value: 'len,fix,hash,pad,join,split,cat,cmp,cue,conv,info,strip,gen,trim',
+  description: 'Comma-separated list of mode modules to build')
+
+option('formats', type: 'string',
+  value: 'wav,aiff,shn,flac,ape,alac,tak,ofr,tta,als,wv,lpac,la,mkw,bonk,kxs,cust,term,null',
+  description: 'Comma-separated list of format modules to build')
+
+option('hardening', type: 'boolean', value: true,
+  description: 'Enable compiler/linker hardening flags (OpenSSF)')

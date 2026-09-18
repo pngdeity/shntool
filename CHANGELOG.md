@@ -20,9 +20,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   the CUE-sheet tokenizer, enabled with `-Dfuzz=true`.
 - A clang-tidy static-analysis gate (`.clang-tidy`) and a CI job covering the
   Clang analyzer, with core/security/unix findings treated as errors.
-- Differential coverage for encoded-format round-trips (`flac`, `ape`, `aiff`),
-  malformed options, missing inputs, ID3v2-prefixed files, and extra, trailing
-  and odd-sized RIFF chunks.
+- Differential coverage for encoded-format round-trips (`flac` and `ape` on the
+  read and write paths, `aiff` on the read path), malformed options, missing
+  inputs, ID3v2-prefixed files, and extra, trailing and odd-sized RIFF chunks.
 
 ### Changed
 

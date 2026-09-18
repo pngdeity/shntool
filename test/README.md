@@ -108,11 +108,13 @@ be non-interactive: pass `-P none` to suppress progress output and prefer a
 Cases whose fixtures come from an external helper (flac, ape, aiff) are added
 through the `_add(name, argv, format)` helper, which records the required
 format in `CASE_REQUIRES`; the case is skipped when that helper is unavailable
-instead of failing. The suite already covers read/write round-trips for each
-encoded format, malformed options and missing inputs, and RIFF edge cases
+instead of failing. flac and ape are compared on both the read and write paths;
+aiff is compared on the read path only, because sox stamps its default AIFF
+comment with the current time, so the encoded bytes are not reproducible. The
+suite also covers malformed options and missing inputs, and RIFF edge cases
 (ID3v2-prefixed files, extra and trailing chunks, odd-sized data).
 
 Because shntool does not wait for its output encoder subprocess (the unused
-`close_and_wait()` in upstream), the harness only snapshots a working tree once
-it has stopped changing (`stable_snapshot`). This keeps the comparison
-deterministic without hiding behavioral differences.
+`close_and_wait()` in upstream), each case runs in its own session and the
+harness drains that process group before snapshotting the working tree. This
+keeps the comparison deterministic without hiding behavioral differences.

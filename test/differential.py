@@ -167,20 +167,24 @@ for _fmt in ("flac", "ape", "aiff"):
         ],
         _fmt,
     )
-    _add(
-        f"conv_wav_to_{_fmt}",
-        [
-            "conv",
-            "-P",
-            "none",
-            "-a",
-            f"to_{_fmt}_",
-            "-o",
+    # sox writes a wall-clock timestamp into its default AIFF comment chunk, so
+    # the encoded bytes are not reproducible. The AIFF decode path is still
+    # covered, and the encoder-spawn path is exercised by flac and ape.
+    if _fmt != "aiff":
+        _add(
+            f"conv_wav_to_{_fmt}",
+            [
+                "conv",
+                "-P",
+                "none",
+                "-a",
+                f"to_{_fmt}_",
+                "-o",
+                _fmt,
+                "stereo_16_44100_1s.wav",
+            ],
             _fmt,
-            "stereo_16_44100_1s.wav",
-        ],
-        _fmt,
-    )
+        )
     _add(
         f"split_{_fmt}",
         [
@@ -296,25 +300,23 @@ def snapshot(root: Path) -> dict[str, str]:
     return result
 
 
-def stable_snapshot(root: Path, timeout: float = 10.0) -> dict[str, str]:
-    """Snapshot root repeatedly until two consecutive reads agree.
+def wait_for_process_group(pgid: int, timeout: float = 10.0) -> None:
+    """Wait until no process remains in the process group pgid.
 
-    shntool does not wait for its output encoder subprocess (see the unused
-    close_and_wait() in upstream), so an encoded file may still be written when
-    the process exits. Waiting for the tree to settle avoids reporting a race
-    as a behavioral difference.
+    shntool does not wait for its output encoder subprocess (the upstream
+    close_and_wait() is defined but never called), so an encoded file may still
+    be written after shntool exits. Each case runs in its own session, so
+    draining the group makes the snapshot deterministic without hiding
+    behavioral differences.
     """
     deadline = time.monotonic() + timeout
-    previous = snapshot(root)
 
     while time.monotonic() < deadline:
-        time.sleep(0.1)
-        current = snapshot(root)
-        if current == previous:
-            return current
-        previous = current
-
-    return previous
+        try:
+            os.killpg(pgid, 0)
+        except ProcessLookupError:
+            return
+        time.sleep(0.05)
 
 
 def normalize(data: bytes, workdir: Path, binary: Path) -> bytes:
@@ -330,30 +332,27 @@ def run_case(
     shutil.copytree(fixtures, workdir / "work")
     work = workdir / "work"
     env = dict(os.environ, LC_ALL="C", LANG="C", TZ="UTC", TERM="dumb")
+
+    proc = subprocess.Popen(
+        [str(binary), *argv],
+        cwd=work,
+        env=env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        start_new_session=True,
+    )
+
     try:
-        proc = subprocess.run(
-            [str(binary), *argv],
-            cwd=work,
-            env=env,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            timeout=TIMEOUT_SECONDS,
-        )
-        return (
-            proc.returncode,
-            proc.stdout,
-            proc.stderr,
-            stable_snapshot(work),
-            workdir,
-        )
-    except subprocess.TimeoutExpired as exc:
-        return (
-            -999,
-            exc.stdout or b"",
-            exc.stderr or b"",
-            stable_snapshot(work),
-            workdir,
-        )
+        stdout, stderr = proc.communicate(timeout=TIMEOUT_SECONDS)
+        returncode = proc.returncode
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        stdout, stderr = proc.communicate()
+        returncode = -999
+    finally:
+        wait_for_process_group(proc.pid)
+
+    return returncode, stdout, stderr, snapshot(work), workdir
 
 
 def describe_files(ref: dict[str, str], cand: dict[str, str]) -> list[str]:

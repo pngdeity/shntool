@@ -45,5 +45,5 @@ static FILE *open_for_output(char *filename, proc_info *pinfo) {
 }
 
 static void create_output_filename(char *outfilename) {
-  strcpy(outfilename, "terminal");
+  st_strlcpy(outfilename, "terminal", FILENAME_SIZE);
 }

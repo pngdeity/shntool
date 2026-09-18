@@ -37,12 +37,12 @@ static void get_quoted_arg_list(child_args *process_args, char *arg_list) {
   int i;
   char tmp[BUF_SIZE];
 
-  strcpy(arg_list, "");
+  arg_list[0] = 0;
 
   for (i = 0; i < process_args->num_args; i++) {
     st_snprintf(tmp, BUF_SIZE, "%s\"%s\"", (0 == i) ? "" : " ",
                 process_args->args[i]);
-    strcat(arg_list, tmp);
+    st_strlcat(arg_list, tmp, BUF_SIZE);
   }
 }
 
@@ -305,13 +305,13 @@ static bool clobber_ask(char *filename) {
       break;
     case 'r':
     case 'R':
-      strcpy(response, "");
+      response[0] = 0;
       while (!strcmp(response, "")) {
         st_info("New name: ");
         (void)!fgets(response, BUF_SIZE - 1, stdin);
         trim(response);
       }
-      strcpy(filename, response);
+      st_strlcpy(filename, response, FILENAME_SIZE);
       return clobber_check(filename);
       break;
     default:
@@ -439,7 +439,7 @@ format_module *find_format(char *fmtname) {
   if (NULL == fmtname)
     st_help("missing file format");
 
-  strcpy(tmp, fmtname);
+  st_strlcpy(tmp, fmtname, BUF_SIZE);
   p = strtok(tmp, seps);
 
   if (NULL == p)

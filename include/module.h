@@ -103,4 +103,8 @@ char *extname(char *);
 /* replacement snprintf */
 void st_snprintf(char *, int, char *, ...);
 
+/* bounded, always-NUL-terminating string copy and concatenation */
+size_t st_strlcpy(char *, const char *, size_t);
+size_t st_strlcat(char *, const char *, size_t);
+
 #endif

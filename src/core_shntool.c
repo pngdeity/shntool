@@ -241,8 +241,8 @@ static bool parse_main(int argc, char **argv) {
       /* found mode - now run it and quit */
       st_priv.mode = st_modes[i];
       st_priv.progmode = st_modes[i]->name;
-      strcat(st_priv.fullprogname, " ");
-      strcat(st_priv.fullprogname, st_priv.progmode);
+      st_strlcat(st_priv.fullprogname, " ", PROGNAME_SIZE);
+      st_strlcat(st_priv.fullprogname, st_priv.progmode, PROGNAME_SIZE);
 
       /* remove mode name from arg list (is this portable?) */
       for (j = 1; j < argc - 1; j++)
@@ -324,7 +324,7 @@ static void globals_init(char *program) {
   st_priv.progname = ((p = strrchr(program, PATHSEPCHAR))) ? (p + 1) : program;
   if ((p = extname(st_priv.progname)))
     *(p - 1) = 0;
-  strcpy(st_priv.fullprogname, st_priv.progname);
+  st_strlcpy(st_priv.fullprogname, st_priv.progname, PROGNAME_SIZE);
   st_priv.progmode = NULL;
   st_priv.clobber_action = CLOBBER_ACTION_ASK;
   st_priv.reorder_type = ORDER_NATURAL;

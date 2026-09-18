@@ -119,6 +119,27 @@ def main() -> int:
     )
     failures.check(identical.returncode == 0, "cmp exit code for identical files")
 
+    # A CUE sheet whose text fields exceed the filename buffer must be handled
+    # safely (truncation), not overflow the stack.
+    long_field = "x" * 4000
+    oversized_cue = (
+        'FILE "album.wav" WAVE\n'
+        f'  TRACK 01 AUDIO\n    TITLE "{long_field}"\n'
+        f'    PERFORMER "{long_field}"\n    INDEX 01 00:00:00\n'
+        f'  TRACK 02 AUDIO\n    TITLE "{long_field}"\n'
+        "    INDEX 01 00:01:00\n"
+    )
+    (work / "oversized.cue").write_text(oversized_cue, encoding="utf-8")
+    oversized = run(
+        binary, work, ["split", "-P", "none", "-f", "oversized.cue", "album.wav"]
+    )
+    failures.check(oversized.returncode >= 0, "oversized CUE did not crash")
+    failures.check(
+        b"buffer overflow detected" not in oversized.stderr
+        and b"stack smashing" not in oversized.stderr,
+        "oversized CUE did not trip a fortify check",
+    )
+
     for item in failures.items:
         print(f"FAIL: {item}")
     print(f"{len(failures.items)} failures")

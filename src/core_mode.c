@@ -154,8 +154,8 @@ static void rename_by_extension(child_args *outargs, char *filename,
 
   /* get user-specified prefix/postfix in %f filename, if any */
 
-  strcpy(custprefix, "");
-  strcpy(custpostfix, "");
+  custprefix[0] = 0;
+  custpostfix[0] = 0;
 
   if (outargs) {
     p = NULL;
@@ -168,23 +168,23 @@ static void rename_by_extension(child_args *outargs, char *filename,
 
     if (p) {
       /* get postfix (everything after %f) */
-      strcpy(custpostfix, p + strlen(FILENAME_PLACEHOLDER));
+      st_strlcpy(custpostfix, p + strlen(FILENAME_PLACEHOLDER), FILENAME_SIZE);
 
       /* get prefix (everything before %f) */
-      strcat(custprefix, outargs->args[i]);
+      st_strlcat(custprefix, outargs->args[i], FILENAME_SIZE);
       *(strstr(custprefix, FILENAME_PLACEHOLDER)) = 0;
     }
   }
 
   /* next, copy directory name, if any */
-  strcpy(dirname, filename);
+  st_strlcpy(dirname, filename, FILENAME_SIZE);
   base = basename(dirname);
   if (base)
     *base = 0;
 
   /* now get base filename as well as its extension */
   base = basename(filename);
-  strcpy(newbasename, base);
+  st_strlcpy(newbasename, base, FILENAME_SIZE);
   ext = extname(newbasename);
 
   /* if input filename's extension matches the input format's default extension,
@@ -198,7 +198,7 @@ static void rename_by_extension(child_args *outargs, char *filename,
   if (strcmp(st_ops.output_directory, ""))
     outdir = st_ops.output_directory;
 
-  strcpy(outdirname, outdir);
+  st_strlcpy(outdirname, outdir, FILENAME_SIZE);
 
 #if 0
   /* leave this out for now... we may be getting too fancy.  let the underlying OS handle it.
@@ -211,7 +211,7 @@ static void rename_by_extension(child_args *outargs, char *filename,
     if (0 == *(p+1))
       break;
     while ((*(p+2)) && (PATHSEPCHAR == *p) && ('.' == *(p+1)) && (PATHSEPCHAR == *(p+2))) {
-      strcpy(p,p+2);
+      memmove(p, p+2, strlen(p+2) + 1);
     }
     p++;
   }
@@ -222,7 +222,7 @@ static void rename_by_extension(child_args *outargs, char *filename,
   p = outdirname;
   while (*p) {
     while ((*(p + 1)) && (PATHSEPCHAR == *p) && (PATHSEPCHAR == *(p + 1))) {
-      strcpy(p + 1, p + 2);
+      memmove(p + 1, p + 2, strlen(p + 2) + 1);
     }
     p++;
   }
@@ -230,13 +230,13 @@ static void rename_by_extension(child_args *outargs, char *filename,
   st_snprintf(tmp, FILENAME_SIZE, ".%c", PATHSEPCHAR);
 
   if (!strcmp(outdirname, ".") || !strcmp(outdirname, tmp))
-    strcpy(outdirname, "");
+    outdirname[0] = 0;
 
   st_snprintf(tmp, FILENAME_SIZE, "%c", PATHSEPCHAR);
 
   if (strcmp(outdirname, "") &&
       PATHSEPCHAR != outdirname[strlen(outdirname) - 1])
-    strcat(outdirname, tmp);
+    st_strlcat(outdirname, tmp, FILENAME_SIZE);
 
   extension = (output_extension) ? output_extension : "";
 
@@ -784,6 +784,37 @@ void st_snprintf(char *dest, int maxlen, char *formatstr, ...)
   va_end(args);
 }
 
+size_t st_strlcpy(char *dst, const char *src, size_t dstsize)
+/* copies at most dstsize-1 bytes from src to dst, always NULL-terminating;
+   returns the length of src */
+{
+  size_t srclen = strlen(src);
+
+  if (dstsize > 0) {
+    size_t copylen = (srclen >= dstsize) ? dstsize - 1 : srclen;
+
+    memcpy(dst, src, copylen);
+    dst[copylen] = 0;
+  }
+
+  return srclen;
+}
+
+size_t st_strlcat(char *dst, const char *src, size_t dstsize)
+/* appends src to dst, always NULL-terminating; returns the length the string
+   would have had if there were enough space */
+{
+  size_t dstlen = 0;
+
+  while ((dstlen < dstsize) && (dst[dstlen] != 0))
+    dstlen++;
+
+  if (dstlen == dstsize)
+    return dstsize + strlen(src);
+
+  return dstlen + st_strlcpy(dst + dstlen, src, dstsize - dstlen);
+}
+
 void length_to_str(wave_info *info)
 /* converts length of file to a string in m:ss or m:ss.ff format */
 {
@@ -930,21 +961,21 @@ int close_and_wait(FILE *fd, proc_info *pinfo, int child_type,
               WIFEXITED(status));
   if (WIFEXITED(status)) {
     st_snprintf(tmp, BUF_SIZE, "/%d", WEXITSTATUS(status));
-    strcat(debuginfo, tmp);
+    st_strlcat(debuginfo, tmp, BUF_SIZE);
   }
   st_snprintf(tmp, BUF_SIZE, "] [%d", WIFSIGNALED(status));
-  strcat(debuginfo, tmp);
+  st_strlcat(debuginfo, tmp, BUF_SIZE);
   if (WIFSIGNALED(status)) {
     st_snprintf(tmp, BUF_SIZE, "/%d", WTERMSIG(status));
-    strcat(debuginfo, tmp);
+    st_strlcat(debuginfo, tmp, BUF_SIZE);
   }
   st_snprintf(tmp, BUF_SIZE, "] [%d", WIFSTOPPED(status));
-  strcat(debuginfo, tmp);
+  st_strlcat(debuginfo, tmp, BUF_SIZE);
   if (WIFSTOPPED(status)) {
     st_snprintf(tmp, BUF_SIZE, "/%d", WSTOPSIG(status));
-    strcat(debuginfo, tmp);
+    st_strlcat(debuginfo, tmp, BUF_SIZE);
   }
-  strcat(debuginfo, "]");
+  st_strlcat(debuginfo, "]", BUF_SIZE);
 
   st_debug2(debuginfo);
 #endif
@@ -1015,7 +1046,7 @@ void alter_file_order(wave_info **filenames, int numfiles)
     st_info("\n? ");
     (void)!fgets(response, BUF_SIZE - 1, stdin);
     if (feof(stdin))
-      strcpy(response, "done");
+      st_strlcpy(response, "done", BUF_SIZE);
     trim(response);
     p = response;
     current = 0;
@@ -1149,7 +1180,7 @@ wlong smrt_parse(unsigned char *data, wave_info *info)
   wlong bytes;
   unsigned char tmp[BUF_SIZE];
 
-  strcpy((char *)tmp, (const char *)data);
+  st_strlcpy((char *)tmp, (const char *)data, BUF_SIZE);
 
   /* check for all digits */
   if ((wlong)-1 != (bytes = is_numeric(tmp)))
@@ -1337,7 +1368,7 @@ void discard_header(wave_info *info) {
 }
 
 void create_output_filename(char *infile, char *inext, char *outfile) {
-  strcpy(outfile, "");
+  outfile[0] = 0;
 
   if (st_ops.output_format) {
     if (st_ops.output_format->create_output_filename) {
@@ -1412,7 +1443,7 @@ void st_global_usage() {
 void arg_init(format_module *fm) {
   char *p, envname[BUF_SIZE], upper[BUF_SIZE];
 
-  strcpy(upper, fm->name);
+  st_strlcpy(upper, fm->name, BUF_SIZE);
 
   /* convert format name to upper case */
   for (p = upper; *p; p++) {
@@ -1738,6 +1769,8 @@ void input_read_all_files() {
 
   while ((filename = input_get_filename())) {
     st_input.filenames[st_input.filemax] = strdup(filename);
+    if (NULL == st_input.filenames[st_input.filemax])
+      st_error("filename duplication failed");
     st_input.filemax++;
     if (st_input.filemax >= MAX_FILENAMES)
       st_error("exceeded maximum number of filenames: [%s]", MAX_FILENAMES);

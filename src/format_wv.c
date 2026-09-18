@@ -143,14 +143,14 @@ static bool file_exists_with_alternate_extension(char *filename, char *ext) {
   char *extp;
   FILE *f;
 
-  strcpy(wvc_filename, filename);
+  st_strlcpy(wvc_filename, filename, FILENAME_SIZE);
 
   extp = filespec_ext(wvc_filename);
 
   if (extp)
     *extp = 0;
 
-  strcat(wvc_filename, ext);
+  st_strlcat(wvc_filename, ext, FILENAME_SIZE);
 
   if ((f = fopen(wvc_filename, "rb"))) {
     fclose(f);

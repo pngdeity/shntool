@@ -431,23 +431,27 @@ wave_info *new_wave_info(char *filename)
       st_snprintf(tmp, BUF_SIZE,
                   "+ you may not have permission to read file: [%s]\n",
                   info->filename);
-      strcat(msg, tmp);
+      st_strlcat(msg, tmp, BUF_SIZE);
 
       if (info->input_format->decoder) {
         st_snprintf(tmp, BUF_SIZE,
                     "+ arguments may be incorrect for decoder: [%s]\n",
                     info->input_format->decoder);
-        strcat(msg, tmp);
+        st_strlcat(msg, tmp, BUF_SIZE);
 
-        strcat(msg,
-               "+ verify that the decoder is installed and in your PATH\n");
+        st_strlcat(msg,
+                   "+ verify that the decoder is installed and in your PATH\n",
+                   BUF_SIZE);
 
         if (info->file_has_id3v2_tag) {
-          strcat(msg, "+ removing the ID3v2 tag from this file may fix this\n");
+          st_strlcat(msg,
+                     "+ removing the ID3v2 tag from this file may fix this\n",
+                     BUF_SIZE);
         }
       }
 
-      strcat(msg, "+ this file may be unsupported, truncated or corrupt");
+      st_strlcat(msg, "+ this file may be unsupported, truncated or corrupt",
+                 BUF_SIZE);
 
       st_warning(msg);
 

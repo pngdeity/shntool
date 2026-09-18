@@ -27,6 +27,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Autotools build files, preserved in the `upstream-3.0.10` tag.
 
+### Fixed
+
+- Replaced all unbounded `strcpy`/`strcat` with bounded, always-terminating
+  `st_strlcpy`/`st_strlcat`; overwriting moves now use `memmove`. Added a
+  crash regression test for oversized CUE fields.
+- Checked the remaining `strdup` result for allocation failure.
+
 ## [3.0.10] - 2009-03-30
 
 Upstream release by Jason Jordan. See `ChangeLog` for the full history.

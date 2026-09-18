@@ -443,35 +443,35 @@ static void cue_sprintf(int tracknum, char *filename) {
 
   p = cueinfo.format;
   c[1] = 0;
-  strcpy(filename, "");
+  filename[0] = 0;
   st_snprintf(psc, 4, "%c", PATHSEPCHAR);
 
   while (*p) {
     if ('%' == *p) {
       if ('a' == *(p + 1)) {
-        strcat(filename, cueinfo.album);
+        st_strlcat(filename, cueinfo.album, FILENAME_SIZE);
         p += 2;
         continue;
       }
       if ('p' == *(p + 1)) {
-        strcat(filename, cueinfo.artists[tracknum]);
+        st_strlcat(filename, cueinfo.artists[tracknum], FILENAME_SIZE);
         p += 2;
         continue;
       }
       if ('t' == *(p + 1)) {
-        strcat(filename, cueinfo.titles[tracknum]);
+        st_strlcat(filename, cueinfo.titles[tracknum], FILENAME_SIZE);
         p += 2;
         continue;
       }
       if ('n' == *(p + 1)) {
         st_snprintf(num, 8, num_format, tracknum + offset);
-        strcat(filename, num);
+        st_strlcat(filename, num, FILENAME_SIZE);
         p += 2;
         continue;
       }
     }
     c[0] = *p;
-    strcat(filename, c);
+    st_strlcat(filename, c, FILENAME_SIZE);
     p++;
   }
 
@@ -498,7 +498,7 @@ static void extract(unsigned char *data)
 
   if (strstr((const char *)data, "INDEX") &&
       (NULL == strstr((const char *)data, ":"))) {
-    strcpy((char *)data, "");
+    data[0] = 0;
     return;
   }
 
@@ -539,7 +539,7 @@ static void get_cue_field(unsigned char *field, unsigned char *line,
                           char *buf) {
   char *p, tmp[FILENAME_SIZE];
 
-  strcpy(tmp, (const char *)line);
+  st_strlcpy(tmp, (const char *)line, FILENAME_SIZE);
   trim(tmp);
 
   /* skip over this keyword to next token */
@@ -555,7 +555,7 @@ static void get_cue_field(unsigned char *field, unsigned char *line,
   if ('"' == p[strlen(p) - 1])
     p[strlen(p) - 1] = 0;
 
-  strcpy(buf, p);
+  st_strlcpy(buf, p, FILENAME_SIZE);
 }
 
 static bool handle_cue_keyword(unsigned char *keyword, unsigned char *line) {
@@ -617,18 +617,18 @@ static void get_cue_keyword(unsigned char *line, unsigned char *keyword) {
   while (*p && !isprint(*p))
     p++;
 
-  strcpy((char *)buf, (const char *)p);
+  st_strlcpy((char *)buf, (const char *)p, BUF_SIZE);
 
   p = (unsigned char *)strtok((char *)buf, " \t");
 
-  strcpy((char *)keyword, (p) ? (const char *)p : "");
+  st_strlcpy((char *)keyword, (p) ? (const char *)p : "", BUF_SIZE);
 }
 
 static bool get_length_token(FILE *input, unsigned char *token) {
   unsigned char keyword[BUF_SIZE];
   char *p;
 
-  strcpy((char *)token, "");
+  token[0] = 0;
 
   if (feof(input))
     return FALSE;
@@ -700,11 +700,11 @@ static void read_split_points_file(wave_info *info) {
   cueinfo.trackno = 0;
   cueinfo.in_global_section = TRUE;
   cueinfo.in_new_track_section = FALSE;
-  strcpy(cueinfo.artist, "");
-  strcpy(cueinfo.album, "");
+  cueinfo.artist[0] = 0;
+  cueinfo.album[0] = 0;
   for (i = 0; i < SPLIT_MAX_PIECES; i++) {
-    strcpy(cueinfo.titles[i], "");
-    strcpy(cueinfo.artists[i], "");
+    cueinfo.titles[i][0] = 0;
+    cueinfo.artists[i][0] = 0;
   }
 
   if (split_point_file) {
@@ -736,8 +736,8 @@ static void read_split_points_file(wave_info *info) {
       adjust_splitfile(numfiles);
 
       if (SPLIT_INPUT_CUE == input_type && 1 == cueinfo.trackno) {
-        strcpy(cueinfo.titles[1], cueinfo.titles[0]);
-        strcpy(cueinfo.titles[0], "pregap");
+        st_strlcpy(cueinfo.titles[1], cueinfo.titles[0], FILENAME_SIZE);
+        st_strlcpy(cueinfo.titles[0], "pregap", FILENAME_SIZE);
         cueinfo.trackno++;
         offset--;
       }
@@ -769,7 +769,7 @@ static void read_split_points_file(wave_info *info) {
     /* global artist overrides track artist when not defined */
     for (i = 0; i < cueinfo.trackno; i++) {
       if (!strcmp(cueinfo.artists[i], ""))
-        strcpy(cueinfo.artists[i], cueinfo.artist);
+        st_strlcpy(cueinfo.artists[i], cueinfo.artist, FILENAME_SIZE);
     }
 
     for (i = 0; i < cueinfo.trackno; i++)

@@ -47,8 +47,19 @@ work with `-Dwerror=false`.
 
 ## Tests
 
-Changes that affect behavior should be reflected in `test/`. Prefer adding a
-differential case over editing existing expectations.
+`meson test -C build` runs the Unity unit tests, the smoke test, and (when a
+reference is configured) the differential oracle. Changes that affect behavior
+should be reflected in `test/`. Prefer adding a differential case over editing
+existing expectations; pure helpers belong in `test/unit/`.
+
+For parser changes, also build and run the fuzzer:
+
+```sh
+CC=clang meson setup build-fuzz -Dfuzz=true
+meson test -C build-fuzz
+```
+
+See `test/README.md` for the full test strategy.
 
 ## Reporting issues
 

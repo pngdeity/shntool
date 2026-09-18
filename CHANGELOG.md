@@ -14,6 +14,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   plus a reference-free smoke test.
 - Governance documentation (README, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY)
   and REUSE licensing metadata.
+- Unity unit-test suite covering endian conversion, bounded string helpers,
+  module helpers, WAVE header construction, and split-point parsing.
+- libFuzzer harness for the WAVE header parser, enabled with `-Dfuzz=true`.
 
 ### Changed
 
@@ -22,6 +25,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `read_n_bytes`, `write_n_bytes`, and `write_padding` use unsigned byte
   counts.
 - Applied clang-format (LLVM base).
+- Core sources are built as a `shntool_core` static library so unit tests and
+  fuzz targets can link without the program entry point.
+- The `st_output`/`st_info`/`st_warning`/`st_error`/`st_help`/`st_debug*` and
+  `st_snprintf` functions now carry `printf` format attributes.
 
 ### Removed
 
@@ -35,6 +42,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Checked the remaining `strdup` result for allocation failure.
 - Removed the unbounded `vsprintf` fallback; `vsnprintf` is guaranteed by the
   C17 baseline, so `st_vsnprintf` always bounds-checks its output.
+- Fixed format-string bugs exposed by the new format attributes, including a
+  swapped pair of arguments in a WAVE-chunk warning that dereferenced a bogus
+  pointer, and several `%d`/`%s`/`%X` specifiers that did not match their
+  argument types.
+- Fixed signed left-shift undefined behaviour in `read_value_long` and the
+  endian converters.
+- Guarded division and modulo by zero on malformed WAVE headers
+  (`rate` and `block_align`).
+- Initialised `filename1`/`filename2` in `cmp` mode to silence a
+  use-of-uninitialized-value path.
 
 ## [3.0.10] - 2009-03-30
 

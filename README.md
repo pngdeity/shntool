@@ -59,12 +59,20 @@ meson compile -C build
 meson test -C build
 ```
 
-This runs a reference-free smoke test. To compare byte-for-byte against
-another build, point the build at a reference binary:
+This runs the Unity unit tests plus a reference-free smoke test. To compare
+byte-for-byte against another build, point the build at a reference binary:
 
 ```sh
 meson setup build -Dreference-shntool=/path/to/reference/shntool
 meson test -C build
+```
+
+Coverage-guided fuzzing of the WAVE header parser is available as an opt-in
+Clang build:
+
+```sh
+CC=clang meson setup build-fuzz -Dfuzz=true
+meson test -C build-fuzz
 ```
 
 See `test/README.md` for details.

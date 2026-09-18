@@ -33,6 +33,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `st_strlcpy`/`st_strlcat`; overwriting moves now use `memmove`. Added a
   crash regression test for oversized CUE fields.
 - Checked the remaining `strdup` result for allocation failure.
+- Removed the unbounded `vsprintf` fallback; `vsnprintf` is guaranteed by the
+  C17 baseline, so `st_vsnprintf` always bounds-checks its output.
 
 ## [3.0.10] - 2009-03-30
 

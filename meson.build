@@ -32,7 +32,7 @@ foreach header : ['inttypes.h', 'memory.h', 'stdint.h', 'stdlib.h', 'string.h',
   endif
 endforeach
 
-foreach func : ['atol', 'strerror', 'sysconf', 'vsnprintf']
+foreach func : ['atol', 'strerror', 'sysconf']
   if cc.has_function(func)
     conf.set('HAVE_' + func.to_upper(), 1)
   endif

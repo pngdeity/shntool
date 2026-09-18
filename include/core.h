@@ -46,11 +46,9 @@
 #define PROGNAME_SIZE 256
 #define MAX_FILENAMES 32768
 
-#ifdef HAVE_VSNPRINTF
+/* vsnprintf is guaranteed by C99 and later, so the bounds-checking form is
+ * always available; the old unbounded vsprintf fallback is gone */
 #define st_vsnprintf(a, b, c, d) vsnprintf(a, b, c, d)
-#else
-#define st_vsnprintf(a, b, c, d) vsprintf(a, c, d)
-#endif
 
 #ifndef HAVE_STRERROR
 extern char *sys_errlist[];

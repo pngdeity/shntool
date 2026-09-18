@@ -1,0 +1,20 @@
+# Normalize line endings to LF on commit, independent of platform.
+* text=auto eol=lf
+
+# Explicit text files
+*.c       text eol=lf
+*.h       text eol=lf
+*.am      text eol=lf
+*.ac      text eol=lf
+*.in      text eol=lf
+*.sh      text eol=lf
+*.1       text eol=lf
+*.md      text eol=lf
+*.toml    text eol=lf
+*.yml     text eol=lf
+COPYING   text eol=lf
+ChangeLog text eol=lf
+
+# Binary assets (none currently)
+*.png binary
+*.jpg binary

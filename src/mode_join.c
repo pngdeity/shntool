@@ -238,6 +238,8 @@ cleanup:
     st_error("failed to join files");
   }
 
+  st_free(joined_info);
+
   return success;
 }
 

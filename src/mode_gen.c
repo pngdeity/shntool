@@ -161,6 +161,8 @@ static bool process() {
     success = FALSE;
   }
 
+  st_free(info);
+
   return success;
 }
 

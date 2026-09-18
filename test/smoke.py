@@ -131,7 +131,9 @@ def main() -> int:
     )
     (work / "oversized.cue").write_text(oversized_cue, encoding="utf-8")
     oversized = run(
-        binary, work, ["split", "-P", "none", "-f", "oversized.cue", "album.wav"]
+        binary,
+        work,
+        ["split", "-P", "none", "-a", "ov_", "-f", "oversized.cue", "album.wav"],
     )
     failures.check(oversized.returncode >= 0, "oversized CUE did not crash")
     failures.check(
@@ -139,6 +141,26 @@ def main() -> int:
         and b"stack smashing" not in oversized.stderr,
         "oversized CUE did not trip a fortify check",
     )
+
+    # A CUE keyword with an empty field (bare TITLE/PERFORMER) must not index
+    # before the parsed field buffer.
+    empty_field_cue = (
+        'FILE "album.wav" WAVE\n'
+        "  TRACK 01 AUDIO\n"
+        '    TITLE "One"\n'
+        "    PERFORMER\n"
+        "    INDEX 01 00:00:00\n"
+        "  TRACK 02 AUDIO\n"
+        '    TITLE "Two"\n'
+        "    INDEX 01 00:01:00\n"
+    )
+    (work / "empty_field.cue").write_text(empty_field_cue, encoding="utf-8")
+    empty_field = run(
+        binary,
+        work,
+        ["split", "-P", "none", "-a", "ef_", "-f", "empty_field.cue", "album.wav"],
+    )
+    failures.check(empty_field.returncode == 0, "empty CUE field split succeeded")
 
     for item in failures.items:
         print(f"FAIL: {item}")

@@ -16,7 +16,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   and REUSE licensing metadata.
 - Unity unit-test suite covering endian conversion, bounded string helpers,
   module helpers, WAVE header construction, and split-point parsing.
-- libFuzzer harness for the WAVE header parser, enabled with `-Dfuzz=true`.
+- libFuzzer harnesses for the WAVE header parser, the ID3v2 tag detector and
+  the CUE-sheet tokenizer, enabled with `-Dfuzz=true`.
 
 ### Changed
 
@@ -29,6 +30,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   fuzz targets can link without the program entry point.
 - The `st_output`/`st_info`/`st_warning`/`st_error`/`st_help`/`st_debug*` and
   `st_snprintf` functions now carry `printf` format attributes.
+- The sanitized test build now keeps LeakSanitizer enabled, so the test suite
+  guards against memory leaks as well as overflows and undefined behaviour.
 
 ### Removed
 
@@ -52,6 +55,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   (`rate` and `block_align`).
 - Initialised `filename1`/`filename2` in `cmp` mode to silence a
   use-of-uninitialized-value path.
+- Freed the `wave_info` allocated by `gen` and `join` modes, which leaked at
+  exit.
+- Guarded the trailing-quote test in `get_cue_field` against an empty field,
+  which indexed one byte before the buffer.
+- Clamped the CUE track counter to `SPLIT_MAX_PIECES` so a sheet with too many
+  `TRACK` lines cannot index past the per-track arrays.
 
 ## [3.0.10] - 2009-03-30
 

@@ -548,11 +548,12 @@ static void get_cue_field(unsigned char *field, unsigned char *line,
   while (' ' == *p || '\t' == *p)
     p++;
 
-  /* check for quotes, and remove them if present */
+  /* check for quotes, and remove them if present. Guard the trailing-quote
+     test: an empty field makes strlen(p) - 1 underflow. */
 
   if ('"' == *p)
     p++;
-  if ('"' == p[strlen(p) - 1])
+  if (('\0' != *p) && ('"' == p[strlen(p) - 1]))
     p[strlen(p) - 1] = 0;
 
   st_strlcpy(buf, p, FILENAME_SIZE);
@@ -566,7 +567,10 @@ static bool handle_cue_keyword(unsigned char *keyword, unsigned char *line) {
   /* TRACK lines indicate beginning of possible TITLES for the tracks */
   if (!strcmp((char *)keyword, "TRACK")) {
     cueinfo.in_global_section = FALSE;
-    cueinfo.trackno++;
+    /* clamp so a sheet with more TRACK lines than SPLIT_MAX_PIECES cannot
+       index past the per-track arrays */
+    if (cueinfo.trackno < SPLIT_MAX_PIECES)
+      cueinfo.trackno++;
     return FALSE;
   }
 
@@ -623,6 +627,41 @@ static void get_cue_keyword(unsigned char *line, unsigned char *keyword) {
 
   st_strlcpy((char *)keyword, (p) ? (const char *)p : "", BUF_SIZE);
 }
+
+#ifdef ST_FUZZ
+/* Hooks used by test/fuzz/fuzz_cue.c. The CUE tokenizer helpers above are
+   static, so the fuzz target drives them through this deliberately small
+   interface. Call st_cue_parse_begin() before each input, then feed one line
+   at a time to st_cue_parse_line(). */
+
+void st_cue_parse_begin(void);
+
+void st_cue_parse_line(unsigned char *line);
+
+void st_cue_parse_begin(void) {
+  int i;
+
+  cueinfo.trackno = 0;
+  cueinfo.in_global_section = TRUE;
+  cueinfo.in_new_track_section = FALSE;
+  cueinfo.artist[0] = 0;
+  cueinfo.album[0] = 0;
+  for (i = 0; i < SPLIT_MAX_PIECES; i++) {
+    cueinfo.titles[i][0] = 0;
+    cueinfo.artists[i][0] = 0;
+  }
+}
+
+void st_cue_parse_line(unsigned char *line) {
+  unsigned char keyword[BUF_SIZE], copy[BUF_SIZE];
+
+  get_cue_keyword(line, keyword);
+  handle_cue_keyword(keyword, line);
+
+  st_strlcpy((char *)copy, (const char *)line, BUF_SIZE);
+  extract(copy);
+}
+#endif
 
 static bool get_length_token(FILE *input, unsigned char *token) {
   unsigned char keyword[BUF_SIZE];

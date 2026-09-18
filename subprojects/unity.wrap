@@ -1,0 +1,10 @@
+[wrap-file]
+directory = Unity-2.7.0
+source_url = https://github.com/ThrowTheSwitch/Unity/archive/refs/tags/v2.7.0.tar.gz
+source_filename = Unity-2.7.0.tar.gz
+source_hash = e84eb301ca7967831e68b1728f911e87fa2d345d8ddb64f897bc2f2ee24a321c
+source_fallback_url = https://wrapdb.mesonbuild.com/v2/unity_2.7.0-1/get_source/Unity-2.7.0.tar.gz
+wrapdb_version = 2.7.0-1
+
+[provide]
+unity = unity_dep

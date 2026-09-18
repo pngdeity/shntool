@@ -57,13 +57,16 @@ project_args = ['-DHAVE_CONFIG_H']
 # runtime and are intentionally omitted from module initializers.
 project_args += cc.get_supported_arguments(['-Wno-missing-field-initializers'])
 
+fuzz_enabled = get_option('fuzz')
+
 if get_option('hardening')
   project_args += cc.get_supported_arguments([
     '-fstack-protector-strong',
     '-fstack-clash-protection',
     '-fcf-protection',
   ])
-  if get_option('optimization') != '0'
+  # _FORTIFY_SOURCE conflicts with the sanitizer runtime used by fuzz builds
+  if get_option('optimization') != '0' and not fuzz_enabled
     project_args += cc.get_supported_arguments(['-D_FORTIFY_SOURCE=3'])
   endif
   add_project_link_arguments(
@@ -72,12 +75,29 @@ if get_option('hardening')
   )
 endif
 
+if fuzz_enabled
+  if cc.get_id() != 'clang'
+    error('the fuzz build requires clang, but the C compiler is ' + cc.get_id())
+  endif
+  # Instrument every object for coverage and memory-safety checks. The
+  # libFuzzer runtime (and its main()) is only linked into the fuzz targets.
+  project_args += [
+    '-fsanitize=fuzzer-no-link,address,undefined',
+    '-fno-omit-frame-pointer',
+  ]
+  # Every target needs the sanitizer runtime; only the fuzz target links the
+  # libFuzzer runtime (and its main()).
+  add_project_link_arguments(['-fsanitize=address,undefined'], language: 'c')
+endif
+
 add_project_arguments(project_args, language: 'c')
 
 inc = include_directories('include')
 
 # --- Module sources ----------------------------------------------------------
 
+# Everything except the program entry point lives in shntool_core so that unit
+# tests and fuzz targets can link against it without pulling in main().
 core_sources = files(
   'src/core_convert.c',
   'src/core_fileio.c',
@@ -85,7 +105,6 @@ core_sources = files(
   'src/core_mode.c',
   'src/core_module.c',
   'src/core_output.c',
-  'src/core_shntool.c',
   'src/core_wave.c',
 )
 
@@ -181,13 +200,20 @@ endforeach
 
 # --- Targets -----------------------------------------------------------------
 
-shntool = executable('shntool',
+shntool_core = static_library('shntool_core',
   core_sources,
   glue_modes,
   glue_formats,
   mode_sources,
   format_sources,
   config_h,
+  include_directories: inc,
+)
+
+shntool = executable('shntool',
+  'src/core_shntool.c',
+  config_h,
+  link_with: shntool_core,
   include_directories: inc,
   install: true,
 )
@@ -203,8 +229,18 @@ endforeach
 
 # --- Tests -------------------------------------------------------------------
 
+# Leak tracking is intentionally off: this tree has pre-existing, harmless
+# at-exit allocations. The sanitized tests still enforce memory safety
+# (overflows, use-after-free, undefined behaviour) with halt_on_error.
+test_env = {}
+if fuzz_enabled
+  test_env += {'ASAN_OPTIONS': 'detect_leaks=0:halt_on_error=1:abort_on_error=1'}
+  test_env += {'UBSAN_OPTIONS': 'halt_on_error=1:abort_on_error=1:print_stacktrace=1'}
+endif
+
 test('smoke', python,
   args: [files('test/smoke.py'), '--binary', shntool.full_path()],
+  env: test_env,
   timeout: 120,
 )
 
@@ -216,6 +252,45 @@ if reference_shntool != ''
       '--candidate', shntool.full_path(),
       '--reference', reference_shntool,
     ],
+    env: test_env,
+    timeout: 600,
+  )
+endif
+
+# --- Unit tests --------------------------------------------------------------
+
+unity_dep = dependency('unity', fallback: ['unity', 'unity_dep'])
+
+unit_test_names = ['convert', 'module', 'string', 'mode', 'wave']
+
+foreach name : unit_test_names
+  unit_test = executable('test_' + name,
+    files('test/unit/test_' + name + '.c'),
+    'test/unit/support.c',
+    config_h,
+    link_with: shntool_core,
+    include_directories: inc,
+    dependencies: unity_dep,
+  )
+  test('unit-' + name, unit_test, env: test_env, timeout: 60)
+endforeach
+
+# --- Fuzzing -----------------------------------------------------------------
+
+if fuzz_enabled
+  fuzz_wave = executable('fuzz_wave',
+    'test/fuzz/fuzz_wave.c',
+    'src/core_shntool.c',
+    config_h,
+    c_args: ['-Dmain=shntool_main'],
+    link_args: ['-fsanitize=fuzzer,address,undefined'],
+    link_with: shntool_core,
+    include_directories: inc,
+  )
+
+  test('fuzz-smoke', python,
+    args: [files('test/fuzz/run_fuzz.py'), '--fuzzer', fuzz_wave.full_path()],
+    env: test_env,
     timeout: 600,
   )
 endif

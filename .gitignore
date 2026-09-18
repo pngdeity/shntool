@@ -24,7 +24,8 @@ src/glue_formats.c
 
 # Meson (generated)
 /build*/
-/subprojects/*/
+# only wrap files are tracked; downloaded sources and wrap state are not
+/subprojects/*
 !/subprojects/*.wrap
 compile_commands.json
 .ninja_*

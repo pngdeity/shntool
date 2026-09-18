@@ -11,3 +11,6 @@ option('hardening', type: 'boolean', value: true,
 
 option('reference-shntool', type: 'string', value: '',
   description: 'Path to a reference shntool binary for differential tests')
+
+option('fuzz', type: 'boolean', value: false,
+  description: 'Build the libFuzzer targets (requires clang and a separate build dir)')

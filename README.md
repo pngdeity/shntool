@@ -87,6 +87,13 @@ shntool split -f album.cue album.wav
 
 Mode aliases (`shnlen`, `shnsplit`, ...) are installed alongside the binary.
 
+## Design notes
+
+- `doc/adr/` records architecture decisions. See
+  `doc/adr/0001-preserve-upstream-architecture.md`.
+- `doc/cue-conformance.md` documents how CUE-sheet constructs are handled by
+  `split`, including the intentionally unsupported ones.
+
 ## Contributing
 
 See `CONTRIBUTING.md`. Commits must be signed.

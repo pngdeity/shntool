@@ -7,7 +7,7 @@ Four layers:
 | `test/unit/` (Unity) | no | Unit tests for pure helpers: endian conversion, bounded string copies, module helpers, WAVE header construction, and split-point parsing. |
 | `test/smoke.py` | no | Runs core modes against generated fixtures and checks structural expectations. |
 | `test/differential.py` | yes | Runs candidate and reference binaries over the same fixtures and compares exit code, stdout, stderr, and every produced file (SHA-256). |
-| `test/fuzz/` (libFuzzer) | no | Coverage-guided fuzzing of the WAVE header parser, run for a bounded number of iterations as a regression test. |
+| `test/fuzz/` (libFuzzer) | no | Coverage-guided fuzzing of the WAVE header parser, the ID3v2 tag detector and the CUE-sheet tokenizer, run for a bounded number of iterations each as regression tests. |
 
 Fixtures are generated deterministically by `test/tools/gen_fixtures.py` using
 only the Python standard library, so they are independent of the program under
@@ -44,21 +44,30 @@ python3 test/differential.py --candidate build/shntool \
 
 ## Fuzzing
 
-The WAVE header parser has a libFuzzer harness in `test/fuzz/fuzz_wave.c`.
+libFuzzer harnesses live in `test/fuzz/`:
+
+| Target | Entry point under test |
+|---|---|
+| `fuzz_wave` | `verify_wav_header_internal()` (RIFF/fmt/data chunk parsing) |
+| `fuzz_id3v2` | `check_for_id3v2_tag()` (ID3v2 header validation and size parsing) |
+| `fuzz_cue` | CUE-sheet tokenizer (`get_cue_keyword`/`get_cue_field`/`extract`) |
+
 Fuzzing needs a Clang toolchain and a dedicated build directory:
 
 ```sh
 CC=clang meson setup build-fuzz -Dfuzz=true
 meson compile -C build-fuzz
-meson test -C build-fuzz fuzz-smoke          # bounded regression run
-build-fuzz/fuzz_wave -max_len=4096 build-fuzz/corpus   # continuous fuzzing
+meson test -C build-fuzz                      # bounded regression runs
+build-fuzz/fuzz_cue -max_len=16384 build-fuzz/corpus   # continuous fuzzing
 ```
 
-Each object is built with `-fsanitize=fuzzer-no-link,address,undefined`; only
-the `fuzz_wave` target links the libFuzzer runtime. `_FORTIFY_SOURCE` is
-disabled in fuzz builds, and LeakSanitizer is disabled in the test environment
-(this tree has known at-exit allocations); the sanitizers still abort on
-overflow, use-after-free, and undefined behaviour.
+Each object is built with `-fsanitize=fuzzer-no-link,address,undefined` and
+`-DST_FUZZ` (which exposes the CUE tokenizer hooks); only the fuzz targets link
+the libFuzzer runtime. `_FORTIFY_SOURCE` is disabled in fuzz builds. The
+sanitizers abort on overflow, use-after-free and undefined behaviour, and
+LeakSanitizer reports lost allocations, so the sanitized test run also guards
+against memory leaks. Leak detection is disabled only for the fuzzer process
+itself, whose error paths intentionally abandon state.
 
 ## Building an upstream reference
 

@@ -53,9 +53,23 @@ def main() -> int:
             with open(os.path.join(corpus, f"seed{index}.wav"), "wb") as handle:
                 handle.write(seed)
 
+        cue_seeds = [
+            b'FILE "album.wav" WAVE\n'
+            b"  TRACK 01 AUDIO\n"
+            b'    TITLE "One"\n'
+            b'    PERFORMER "A"\n'
+            b"    INDEX 01 00:00:00\n",
+            b"TRACK 01 AUDIO\nTITLE x\nPERFORMER y\nINDEX 01 00:00:00\n",
+        ]
+        for index, seed in enumerate(cue_seeds):
+            with open(os.path.join(corpus, f"cue{index}.cue"), "wb") as handle:
+                handle.write(seed)
+
         env = dict(os.environ)
-        env.setdefault("ASAN_OPTIONS", "detect_leaks=0:abort_on_error=1")
-        env.setdefault("UBSAN_OPTIONS", "halt_on_error=1:print_stacktrace=1")
+        # Fuzz targets intentionally leave state behind on error paths, so leak
+        # detection is disabled for the fuzzer process itself.
+        env["ASAN_OPTIONS"] = "detect_leaks=0:halt_on_error=1:abort_on_error=1"
+        env["UBSAN_OPTIONS"] = "halt_on_error=1:abort_on_error=1:print_stacktrace=1"
 
         command = [
             args.fuzzer,

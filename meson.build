@@ -84,6 +84,7 @@ if fuzz_enabled
   project_args += [
     '-fsanitize=fuzzer-no-link,address,undefined',
     '-fno-omit-frame-pointer',
+    '-DST_FUZZ',
   ]
   # Every target needs the sanitizer runtime; only the fuzz target links the
   # libFuzzer runtime (and its main()).
@@ -229,12 +230,12 @@ endforeach
 
 # --- Tests -------------------------------------------------------------------
 
-# Leak tracking is intentionally off: this tree has pre-existing, harmless
-# at-exit allocations. The sanitized tests still enforce memory safety
-# (overflows, use-after-free, undefined behaviour) with halt_on_error.
+# The sanitized test runs check memory safety and leaks: overflows,
+# use-after-free and undefined behaviour abort immediately, and lost
+# allocations are reported.
 test_env = {}
 if fuzz_enabled
-  test_env += {'ASAN_OPTIONS': 'detect_leaks=0:halt_on_error=1:abort_on_error=1'}
+  test_env += {'ASAN_OPTIONS': 'detect_leaks=1:halt_on_error=1:abort_on_error=1'}
   test_env += {'UBSAN_OPTIONS': 'halt_on_error=1:abort_on_error=1:print_stacktrace=1'}
 endif
 
@@ -278,19 +279,33 @@ endforeach
 # --- Fuzzing -----------------------------------------------------------------
 
 if fuzz_enabled
-  fuzz_wave = executable('fuzz_wave',
-    'test/fuzz/fuzz_wave.c',
-    'src/core_shntool.c',
-    config_h,
-    c_args: ['-Dmain=shntool_main'],
-    link_args: ['-fsanitize=fuzzer,address,undefined'],
-    link_with: shntool_core,
-    include_directories: inc,
-  )
+  # Each fuzz target links the test support object (st_priv/st_input/st_version)
+  # rather than core_shntool.c, so no main() is pulled in.
+  fuzz_targets = {
+    'fuzz_wave': {'max_len': 4096},
+    'fuzz_id3v2': {'max_len': 512},
+    'fuzz_cue': {'max_len': 16384},
+  }
 
-  test('fuzz-smoke', python,
-    args: [files('test/fuzz/run_fuzz.py'), '--fuzzer', fuzz_wave.full_path()],
-    env: test_env,
-    timeout: 600,
-  )
+  foreach name, opts : fuzz_targets
+    fuzz_exe = executable(name,
+      'test/fuzz/' + name + '.c',
+      'test/unit/support.c',
+      config_h,
+      link_args: ['-fsanitize=fuzzer,address,undefined'],
+      link_with: shntool_core,
+      include_directories: inc,
+    )
+
+    test(name,
+      python,
+      args: [
+        files('test/fuzz/run_fuzz.py'),
+        '--fuzzer', fuzz_exe.full_path(),
+        '--max-len', opts['max_len'].to_string(),
+      ],
+      env: test_env,
+      timeout: 600,
+    )
+  endforeach
 endif

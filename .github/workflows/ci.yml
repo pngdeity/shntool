@@ -6,6 +6,7 @@
 #   fuzz        - Clang sanitizer build; bounded libFuzzer regression runs.
 #   subset      - a reduced -Dmodes=/-Dformats= configuration still builds and
 #                 its unit tests pass.
+#   tidy        - clang-tidy static analysis (clang-analyzer, blocking).
 #   lint        - REUSE compliance (blocking) and clang-format (advisory).
 #
 # The differential oracle ships its own generated ./configure, so the reference
@@ -138,6 +139,52 @@ jobs:
         run: >
           meson test -C build-sub --print-errorlogs unit-convert unit-module unit-string unit-mode unit-wave
 
+  tidy:
+    name: clang-tidy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install Meson and Ninja
+        run: |
+          uv tool install meson
+          uv tool install ninja
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Ensure clang and clang-tidy are available
+        run: |
+          if ! command -v clang-tidy >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y clang clang-tidy
+          fi
+      - name: Cache Meson subprojects
+        uses: actions/cache@v4
+        with:
+          path: subprojects/packagecache
+          key: subprojects-${{ runner.os }}-${{ hashFiles('subprojects/*.wrap') }}
+          restore-keys: subprojects-${{ runner.os }}-
+      - name: Configure (compile_commands.json)
+        run: CC=clang meson setup build
+      - name: Analyse
+        run: |
+          mapfile -t files < <(
+            jq -r '.[].file' build/compile_commands.json \
+              | sort -u \
+              | grep -v -e '/subprojects/' -e '/build/'
+          )
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "no translation units selected for analysis" >&2
+            exit 1
+          fi
+          if command -v run-clang-tidy >/dev/null; then
+            run-clang-tidy -p build -quiet "${files[@]}"
+          else
+            clang-tidy -p build "${files[@]}"
+          fi
   lint:
     name: lint (reuse, format)
     runs-on: ubuntu-latest

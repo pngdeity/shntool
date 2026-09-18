@@ -73,7 +73,7 @@ static void parse_args(format_module *fm, char *argstr, bool is_output,
   ca = (is_output) ? &fm->output_args_template : &fm->input_args_template;
 
   /* read first token */
-  token = strtok(argdup, seps);
+  token = strtok(argdup, seps); /* NOLINT(clang-analyzer-unix.Malloc) */
 
   /* skip certain arguments based on the source of the string we're parsing.
      format default = "arg1 arg2 ... argN"
@@ -1747,7 +1747,7 @@ char *input_get_filename() {
     break;
 
   case INPUT_INTERNAL:
-    if (st_input.filecur < st_input.filemax) {
+    if (st_input.filecur >= 0 && st_input.filecur < st_input.filemax) {
       st_debug1("returning file %d: [%s]", st_input.filecur,
                 st_input.filenames[st_input.filecur]);
       filename = st_input.filenames[st_input.filecur];

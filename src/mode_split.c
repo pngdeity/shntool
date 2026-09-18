@@ -423,13 +423,15 @@ static void adjust_splitfile(int whichfile) {
 }
 
 static void xlate_chars(char *str, char *xlstr) {
-  int i;
+  int i, len;
   char *p;
 
   if (!str || !xlstr)
     return;
 
-  for (i = 0; xlstr[i] && xlstr[i + 1]; i += 2) {
+  len = (int)strlen(xlstr);
+
+  for (i = 0; i + 1 < len; i += 2) {
     for (p = str; *p; p++) {
       if (xlstr[i] == *p) {
         *p = xlstr[i + 1];

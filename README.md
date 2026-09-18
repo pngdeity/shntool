@@ -93,6 +93,8 @@ Mode aliases (`shnlen`, `shnsplit`, ...) are installed alongside the binary.
   `doc/adr/0001-preserve-upstream-architecture.md`.
 - `doc/cue-conformance.md` documents how CUE-sheet constructs are handled by
   `split`, including the intentionally unsupported ones.
+- `.clang-tidy` gates the Clang static analyzer (core/security/unix findings are
+  errors); CI runs it over the Meson compilation database.
 
 ## Contributing
 

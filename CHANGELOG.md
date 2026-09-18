@@ -18,6 +18,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   module helpers, WAVE header construction, and split-point parsing.
 - libFuzzer harnesses for the WAVE header parser, the ID3v2 tag detector and
   the CUE-sheet tokenizer, enabled with `-Dfuzz=true`.
+- A clang-tidy static-analysis gate (`.clang-tidy`) and a CI job covering the
+  Clang analyzer, with core/security/unix findings treated as errors.
+- Differential coverage for encoded-format round-trips (`flac`, `ape`, `aiff`),
+  malformed options, missing inputs, ID3v2-prefixed files, and extra, trailing
+  and odd-sized RIFF chunks.
 
 ### Changed
 
@@ -32,6 +37,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `st_snprintf` functions now carry `printf` format attributes.
 - The sanitized test build now keeps LeakSanitizer enabled, so the test suite
   guards against memory leaks as well as overflows and undefined behaviour.
+- `st_error` and `st_help` are declared `noreturn`, so a fatal-error call is
+  known to terminate control flow.
+- The differential harness waits for asynchronous output encoders to finish
+  before comparing produced files.
 
 ### Removed
 
@@ -61,6 +70,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   which indexed one byte before the buffer.
 - Clamped the CUE track counter to `SPLIT_MAX_PIECES` so a sheet with too many
   `TRACK` lines cannot index past the per-track arrays.
+- Bounded the character-translation scan in `split` by the source string
+  length, removing a potential out-of-bounds read on a full buffer.
+- Guarded the internal filename cursor in `core_mode` against a negative index.
 
 ## [3.0.10] - 2009-03-30
 

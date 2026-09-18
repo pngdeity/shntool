@@ -40,6 +40,10 @@ coverage/
 # Test scratch
 /test/tmp/
 
+# Python
+__pycache__/
+*.pyc
+
 # Editors and tooling
 *.swp
 *~

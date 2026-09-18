@@ -31,11 +31,19 @@
 #define ST_PRINTF_FORMAT(fmt_idx, first_arg)
 #endif
 
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#define ST_NORETURN _Noreturn
+#elif defined(__GNUC__) || defined(__clang__)
+#define ST_NORETURN __attribute__((noreturn))
+#else
+#define ST_NORETURN
+#endif
+
 void st_output(char *, ...) ST_PRINTF_FORMAT(1, 2);
 void st_info(char *, ...) ST_PRINTF_FORMAT(1, 2);
 void st_warning(char *, ...) ST_PRINTF_FORMAT(1, 2);
-void st_error(char *, ...) ST_PRINTF_FORMAT(1, 2);
-void st_help(char *, ...) ST_PRINTF_FORMAT(1, 2);
+ST_NORETURN void st_error(char *, ...) ST_PRINTF_FORMAT(1, 2);
+ST_NORETURN void st_help(char *, ...) ST_PRINTF_FORMAT(1, 2);
 void st_debug1(char *, ...) ST_PRINTF_FORMAT(1, 2);
 void st_debug2(char *, ...) ST_PRINTF_FORMAT(1, 2);
 void st_debug3(char *, ...) ST_PRINTF_FORMAT(1, 2);

@@ -26,6 +26,7 @@ work with `-Dwerror=false`.
   tag and runs the unit, smoke, and differential tests against it.
 - `fuzz` (Clang): sanitizer build with the bounded libFuzzer regression runs.
 - `subset`: a reduced `-Dmodes=len,info -Dformats=wav` build and its unit tests.
+- `tidy`: clang-tidy static analysis over the Meson compilation database.
 - `lint`: REUSE compliance (required) and clang-format (advisory).
 
 PRs are expected to keep the pipeline green.
@@ -39,7 +40,9 @@ PRs are expected to keep the pipeline green.
   clang-format -i include/*.h src/*.c
   ```
 
-- Static analysis: `run-clang-tidy -p build`.
+- Static analysis: `run-clang-tidy -p build`. Checks are selected in
+  `.clang-tidy`; the Clang analyzer's core, security and unix findings are
+  errors.
 - Keep diffs focused and consistent with the surrounding code.
 
 ## Commits

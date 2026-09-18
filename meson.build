@@ -195,3 +195,22 @@ foreach name : enabled_modes
     install_dir: get_option('bindir'),
   )
 endforeach
+
+# --- Tests -------------------------------------------------------------------
+
+test('smoke', python,
+  args: [files('test/smoke.py'), '--binary', shntool.full_path()],
+  timeout: 120,
+)
+
+reference_shntool = get_option('reference-shntool')
+if reference_shntool != ''
+  test('differential', python,
+    args: [
+      files('test/differential.py'),
+      '--candidate', shntool.full_path(),
+      '--reference', reference_shntool,
+    ],
+    timeout: 600,
+  )
+endif

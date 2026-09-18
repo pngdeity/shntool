@@ -8,3 +8,6 @@ option('formats', type: 'string',
 
 option('hardening', type: 'boolean', value: true,
   description: 'Enable compiler/linker hardening flags (OpenSSF)')
+
+option('reference-shntool', type: 'string', value: '',
+  description: 'Path to a reference shntool binary for differential tests')

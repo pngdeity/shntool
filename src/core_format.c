@@ -210,7 +210,7 @@ static void spawn(child_args *process_args, FILE **readpipe, FILE **writepipe,
                process_args->args[0]);
     }
 
-    break;
+    _exit(ST_EXIT_ERROR);
   default:
     /* parent */
     close(pipe1[0]);

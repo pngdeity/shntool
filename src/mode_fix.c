@@ -438,7 +438,7 @@ static bool process(int argc, char **argv, int start) {
   reorder_files(files, numfiles);
 
   i = 0;
-  while (!PROB_BAD_BOUND(files[i]))
+  while (i < numfiles && !PROB_BAD_BOUND(files[i]))
     i++;
 
   if (skip) {
@@ -447,10 +447,10 @@ static bool process(int argc, char **argv, int start) {
                  (1 == i) ? "" : "s", (1 == i) ? "it" : "they");
       for (j = 0; j < i; j++)
         st_free(files[j]);
-      for (j = i; j < numfiles; j++) {
-        files[j - i] = files[j];
+      for (j = 0; j < numfiles - i; j++)
+        files[j] = files[j + i];
+      for (j = numfiles - i; j <= numfiles; j++)
         files[j] = NULL;
-      }
       numfiles -= i;
     }
   }

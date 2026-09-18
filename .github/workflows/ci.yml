@@ -174,7 +174,7 @@ jobs:
           mapfile -t files < <(
             jq -r '.[].file' build/compile_commands.json \
               | sort -u \
-              | grep -v -e '/subprojects/' -e '/build/'
+              | grep -v -e 'subprojects/' -e 'glue_'
           )
           if [ "${#files[@]}" -eq 0 ]; then
             echo "no translation units selected for analysis" >&2

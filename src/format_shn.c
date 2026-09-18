@@ -13,7 +13,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include "format.h"
@@ -30,51 +31,48 @@ static char default_encoder_args[] = "- " FILENAME_PLACEHOLDER;
 
 static void show_extra_info(char *);
 
-format_module format_shn = {
-  "shn",
-  "Shorten low complexity waveform coder",
-  CVSIDSTR,
-  TRUE,
-  TRUE,
-  FALSE,
-  TRUE,
-  TRUE,
-  FALSE,
-  NULL,
-  SHORTEN_MAGIC,
-  0,
-  "shn",
-  SHORTEN,
-  default_decoder_args,
-  SHORTEN,
-  default_encoder_args,
-  NULL,
-  NULL,
-  NULL,
-  show_extra_info,
-  NULL,
-  NULL
-};
+format_module format_shn = {"shn",
+                            "Shorten low complexity waveform coder",
+                            CVSIDSTR,
+                            TRUE,
+                            TRUE,
+                            FALSE,
+                            TRUE,
+                            TRUE,
+                            FALSE,
+                            NULL,
+                            SHORTEN_MAGIC,
+                            0,
+                            "shn",
+                            SHORTEN,
+                            default_decoder_args,
+                            SHORTEN,
+                            default_encoder_args,
+                            NULL,
+                            NULL,
+                            NULL,
+                            show_extra_info,
+                            NULL,
+                            NULL};
 
-static void show_extra_info(char *filename)
-{
+static void show_extra_info(char *filename) {
   FILE *f;
   unsigned char buf[9];
 
   st_output("  Seekable:                   ");
 
-  if (NULL == (f = fopen(filename,"r"))) {
+  if (NULL == (f = fopen(filename, "r"))) {
     st_output("(error: could not open file)\n");
     return;
   }
 
-  if (fseek(f,-8,SEEK_END)) {
+  if (fseek(f, -8, SEEK_END)) {
     st_output("(error: could not seek to end of file)\n");
     fclose(f);
     return;
   }
 
-  if (8 != fread(buf,1,8,f)) {
+  if (8 != fread(buf, 1, 8, f)) {
     st_output("(error: could not read last 8 bytes of file)\n");
     fclose(f);
     return;
@@ -84,7 +82,7 @@ static void show_extra_info(char *filename)
 
   buf[8] = 0;
 
-  if (!tagcmp(buf,(unsigned char *)SHORTEN_SEEKTABLE_MAGIC))
+  if (!tagcmp(buf, (unsigned char *)SHORTEN_SEEKTABLE_MAGIC))
     st_output("yes\n");
   else
     st_output("no\n");

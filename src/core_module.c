@@ -13,7 +13,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include <string.h>
@@ -23,22 +24,20 @@ CVSID("$Id: core_module.c,v 1.148 2009/03/11 17:18:01 jason Exp $")
 
 /* public functions */
 
-unsigned long check_for_id3v2_tag(FILE *f)
-{
+unsigned long check_for_id3v2_tag(FILE *f) {
   id3v2_header id3v2hdr;
   unsigned long tag_size;
 
   /* read an ID3v2 header's size worth of data */
-  if (sizeof(id3v2_header) != fread(&id3v2hdr,1,sizeof(id3v2_header),f)) {
+  if (sizeof(id3v2_header) != fread(&id3v2hdr, 1, sizeof(id3v2_header), f)) {
     return 0;
   }
 
   /* verify this is an ID3v2 header */
-  if (tagcmp((unsigned char *)id3v2hdr.magic,(unsigned char *)ID3V2_MAGIC) ||
+  if (tagcmp((unsigned char *)id3v2hdr.magic, (unsigned char *)ID3V2_MAGIC) ||
       0xff == id3v2hdr.version[0] || 0xff == id3v2hdr.version[1] ||
       0x80 <= id3v2hdr.size[0] || 0x80 <= id3v2hdr.size[1] ||
-      0x80 <= id3v2hdr.size[2] || 0x80 <= id3v2hdr.size[3])
-  {
+      0x80 <= id3v2hdr.size[2] || 0x80 <= id3v2hdr.size[3]) {
     return 0;
   }
 
@@ -48,13 +47,14 @@ unsigned long check_for_id3v2_tag(FILE *f)
   return tag_size;
 }
 
-FILE *open_input_internal(char *filename,bool *file_has_id3v2_tag,wlong *id3v2_tag_size)
+FILE *open_input_internal(char *filename, bool *file_has_id3v2_tag,
+                          wlong *id3v2_tag_size)
 /* opens a file, and if it contains an ID3v2 tag, skips past it */
 {
   FILE *f;
   unsigned long tag_size;
 
-  if (NULL == (f = fopen(filename,"rb"))) {
+  if (NULL == (f = fopen(filename, "rb"))) {
     return NULL;
   }
 
@@ -67,7 +67,7 @@ FILE *open_input_internal(char *filename,bool *file_has_id3v2_tag,wlong *id3v2_t
   /* check for ID3v2 tag on input */
   if (0 == (tag_size = check_for_id3v2_tag(f))) {
     fclose(f);
-    return fopen(filename,"rb");
+    return fopen(filename, "rb");
   }
 
   if (file_has_id3v2_tag)
@@ -76,30 +76,29 @@ FILE *open_input_internal(char *filename,bool *file_has_id3v2_tag,wlong *id3v2_t
   if (id3v2_tag_size)
     *id3v2_tag_size = (wlong)(tag_size + sizeof(id3v2_header));
 
-  st_debug1("discarding %lu-byte ID3v2 tag at beginning of file: [%s]",tag_size+sizeof(id3v2_header),filename);
+  st_debug1("discarding %lu-byte ID3v2 tag at beginning of file: [%s]",
+            tag_size + sizeof(id3v2_header), filename);
 
-  if (fseek(f,(long)tag_size,SEEK_CUR)) {
-    st_warning("error while discarding ID3v2 tag in file: [%s]",filename);
+  if (fseek(f, (long)tag_size, SEEK_CUR)) {
+    st_warning("error while discarding ID3v2 tag in file: [%s]", filename);
     fclose(f);
-    return fopen(filename,"rb");
+    return fopen(filename, "rb");
   }
 
   return f;
 }
 
-FILE *open_output(char *filename)
-{
-  return fopen(filename,"wb");
-}
+FILE *open_output(char *filename) { return fopen(filename, "wb"); }
 
 char *scan_env(char *envvar)
-/* function to scan environment and return a pointer to the variable if it exists and is nonempty, otherwise returns NULL */
+/* function to scan environment and return a pointer to the variable if it
+   exists and is nonempty, otherwise returns NULL */
 {
   char *envp;
 
   envp = getenv(envvar);
 
-  if ((NULL == envp) || (!strcmp(envp,"")))
+  if ((NULL == envp) || (!strcmp(envp, "")))
     return NULL;
 
   return envp;
@@ -119,11 +118,12 @@ void trim(char *str)
 }
 
 char *basename(char *filename)
-/* function to return the basename of a file (filename minus any directory names) */
+/* function to return the basename of a file (filename minus any directory
+   names) */
 {
   char *base;
 
-  if ((base = strrchr(filename,PATHSEPCHAR)))
+  if ((base = strrchr(filename, PATHSEPCHAR)))
     base++;
   else
     base = filename;
@@ -134,11 +134,11 @@ char *basename(char *filename)
 char *extname(char *filename)
 /* function to return the extension of a file, if any */
 {
-  char *base,*ext;
+  char *base, *ext;
 
   base = basename(filename);
 
-  if ((ext = strrchr(base,'.')))
+  if ((ext = strrchr(base, '.')))
     ext++;
   else
     ext = NULL;

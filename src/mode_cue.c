@@ -13,7 +13,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include <string.h>
@@ -21,24 +22,19 @@
 
 CVSID("$Id: mode_cue.c,v 1.48 2009/03/17 17:23:05 jason Exp $")
 
-static bool cue_main(int,char **);
+static bool cue_main(int, char **);
 static void cue_help(void);
 
 mode_module mode_cue = {
-  "cue",
-  "shncue",
-  "Generates a CUE sheet or split points from a set of files",
-  CVSIDSTR,
-  FALSE,
-  cue_main,
-  cue_help
-};
+    "cue",
+    "shncue",
+    "Generates a CUE sheet or split points from a set of files",
+    CVSIDSTR,
+    FALSE,
+    cue_main,
+    cue_help};
 
-enum {
-  TYPE_UNKNOWN,
-  TYPE_CUESHEET,
-  TYPE_SPLITPOINTS
-};
+enum { TYPE_UNKNOWN, TYPE_CUESHEET, TYPE_SPLITPOINTS };
 
 static int output_type = TYPE_UNKNOWN;
 
@@ -47,9 +43,8 @@ static int numfiles = 0;
 
 static wave_info *totals = NULL;
 
-static void cue_help()
-{
-  st_info("Usage: %s [OPTIONS] [files]\n",st_progname());
+static void cue_help() {
+  st_info("Usage: %s [OPTIONS] [files]\n", st_progname());
   st_info("\n");
   st_info("Mode-specific options:\n");
   st_info("\n");
@@ -59,30 +54,28 @@ static void cue_help()
   st_info("\n");
 }
 
-static void parse(int argc,char **argv,int *first_arg)
-{
+static void parse(int argc, char **argv, int *first_arg) {
   int c;
 
   output_type = TYPE_CUESHEET;
 
-  while ((c = st_getopt(argc,argv,"cs")) != -1) {
+  while ((c = st_getopt(argc, argv, "cs")) != -1) {
     switch (c) {
-      case 'c':
-        output_type = TYPE_CUESHEET;
-        break;
-      case 's':
-        output_type = TYPE_SPLITPOINTS;
-        break;
+    case 'c':
+      output_type = TYPE_CUESHEET;
+      break;
+    case 's':
+      output_type = TYPE_SPLITPOINTS;
+      break;
     }
   }
 
   *first_arg = optind;
 }
 
-static void verify_wave_info(wave_info *info)
-{
+static void verify_wave_info(wave_info *info) {
   if ((TYPE_CUESHEET == output_type) && PROB_NOT_CD(info)) {
-    st_error("file is not CD-quality: [%s]",info->filename);
+    st_error("file is not CD-quality: [%s]", info->filename);
   }
 
   if (0 == totals->wave_format && 0 == totals->channels &&
@@ -118,8 +111,7 @@ static void verify_wave_info(wave_info *info)
   }
 }
 
-static void output_init()
-{
+static void output_init() {
   if (NULL == (totals = new_wave_info(NULL)))
     st_error("could not allocate memory for totals");
 
@@ -128,8 +120,7 @@ static void output_init()
   }
 }
 
-static bool output_track(char *filename)
-{
+static bool output_track(char *filename) {
   wave_info *info;
   wlong curr_data_size = 0;
   char *p;
@@ -147,14 +138,13 @@ static bool output_track(char *filename)
     info->data_size = (wlong)total_data_size;
     info->length = info->data_size / info->rate;
     length_to_str(info);
-    if ((p = strstr(info->m_ss,".")))
+    if ((p = strstr(info->m_ss, ".")))
       *p = ':';
-    st_output("  TRACK %02d AUDIO\n",numfiles);
-    st_output("    INDEX 01 %s\n",info->m_ss);
-  }
-  else if (output_type == TYPE_SPLITPOINTS) {
+    st_output("  TRACK %02d AUDIO\n", numfiles);
+    st_output("    INDEX 01 %s\n", info->m_ss);
+  } else if (output_type == TYPE_SPLITPOINTS) {
     if (total_data_size > 0.0)
-      st_output("%0.0f\n",total_data_size);
+      st_output("%0.0f\n", total_data_size);
   }
 
   total_data_size += (double)curr_data_size;
@@ -162,8 +152,7 @@ static bool output_track(char *filename)
   return TRUE;
 }
 
-static void output_end()
-{
+static void output_end() {
   if (TYPE_CUESHEET == output_type && numfiles < 1) {
     st_error("need one or more files in order to generate CUE sheet");
   }
@@ -173,8 +162,7 @@ static void output_end()
   }
 }
 
-static bool process(int argc,char **argv,int start)
-{
+static bool process(int argc, char **argv, int start) {
   char *filename;
   bool success;
 
@@ -182,7 +170,7 @@ static bool process(int argc,char **argv,int start)
 
   output_init();
 
-  input_init(start,argc,argv);
+  input_init(start, argc, argv);
 
   while ((filename = input_get_filename())) {
     success = (output_track(filename) && success);
@@ -193,11 +181,10 @@ static bool process(int argc,char **argv,int start)
   return success;
 }
 
-static bool cue_main(int argc,char **argv)
-{
+static bool cue_main(int argc, char **argv) {
   int first_arg;
 
-  parse(argc,argv,&first_arg);
+  parse(argc, argv, &first_arg);
 
-  return process(argc,argv,first_arg);
+  return process(argc, argv, first_arg);
 }

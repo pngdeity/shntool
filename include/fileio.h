@@ -13,7 +13,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 /*
@@ -27,28 +28,33 @@
 #include "mode-types.h"
 
 /* writes the specified number of zero bytes to the file descriptor given */
-int write_padding(FILE *,int,progress_info *);
+int write_padding(FILE *, int, progress_info *);
 
 /* reads n bytes from a file into a buffer */
-int read_n_bytes(FILE *,unsigned char *,int,progress_info *);
+int read_n_bytes(FILE *, unsigned char *, int, progress_info *);
 
 /* writes n bytes from a buffer into a file */
-int write_n_bytes(FILE *,unsigned char *,int,progress_info *);
+int write_n_bytes(FILE *, unsigned char *, int, progress_info *);
 
 /* transfers n bytes from a file into another file */
-unsigned long transfer_n_bytes_internal(FILE *,FILE *,FILE *,unsigned long,progress_info *);
-#define transfer_n_bytes(a,b,c,d)       transfer_n_bytes_internal(a,b,NULL,c,d)
-#define transfer_n_bytes2(a,b,c,d,e)    transfer_n_bytes_internal(a,b,c,d,e)
+unsigned long transfer_n_bytes_internal(FILE *, FILE *, FILE *, unsigned long,
+                                        progress_info *);
+#define transfer_n_bytes(a, b, c, d) transfer_n_bytes_internal(a, b, NULL, c, d)
+#define transfer_n_bytes2(a, b, c, d, e)                                       \
+  transfer_n_bytes_internal(a, b, c, d, e)
 
-/* reads an unsigned long in big- and/or little-endian format from a file descriptor */
-bool read_value_long(FILE * file,unsigned long *,unsigned long *,unsigned char *);
-#define read_tag(f,t)     read_value_long(f,NULL,NULL,t)
-#define read_be_long(f,b) read_value_long(f,b,NULL,NULL)
-#define read_le_long(f,l) read_value_long(f,NULL,l,NULL)
+/* reads an unsigned long in big- and/or little-endian format from a file
+ * descriptor */
+bool read_value_long(FILE *file, unsigned long *, unsigned long *,
+                     unsigned char *);
+#define read_tag(f, t) read_value_long(f, NULL, NULL, t)
+#define read_be_long(f, b) read_value_long(f, b, NULL, NULL)
+#define read_le_long(f, l) read_value_long(f, NULL, l, NULL)
 
-/* reads an unsigned short in big- and/or little-endian format from a file descriptor */
-bool read_value_short(FILE * file,unsigned short *,unsigned short *);
-#define read_be_short(f,b) read_value_short(f,b,NULL)
-#define read_le_short(f,l) read_value_short(f,NULL,l)
+/* reads an unsigned short in big- and/or little-endian format from a file
+ * descriptor */
+bool read_value_short(FILE *file, unsigned short *, unsigned short *);
+#define read_be_short(f, b) read_value_short(f, b, NULL)
+#define read_le_short(f, l) read_value_short(f, NULL, l)
 
 #endif

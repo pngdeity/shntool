@@ -13,7 +13,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include "format.h"
@@ -38,28 +39,26 @@ static char default_decoder_args[] = "-i " FILENAME_PLACEHOLDER " -f wav -";
 static char default_encoder_args[] = "-i - -acodec alac " FILENAME_PLACEHOLDER;
 */
 
-format_module format_alac = {
-  "alac",
-  "Apple Lossless Audio Codec",
-  CVSIDSTR,
-  TRUE,
-  FALSE,
-  FALSE,
-  TRUE,
-  TRUE,
-  FALSE,
-  "-",
-  ALAC_MAGIC,
-  8,
-  "m4a",
-  ALAC,
-  default_decoder_args,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL
-};
+format_module format_alac = {"alac",
+                             "Apple Lossless Audio Codec",
+                             CVSIDSTR,
+                             TRUE,
+                             FALSE,
+                             FALSE,
+                             TRUE,
+                             TRUE,
+                             FALSE,
+                             "-",
+                             ALAC_MAGIC,
+                             8,
+                             "m4a",
+                             ALAC,
+                             default_decoder_args,
+                             NULL,
+                             NULL,
+                             NULL,
+                             NULL,
+                             NULL,
+                             NULL,
+                             NULL,
+                             NULL};

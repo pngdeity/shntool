@@ -13,7 +13,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include "format.h"
@@ -27,28 +28,26 @@ CVSID("$Id: format_als.c,v 1.5 2009/03/11 17:18:01 jason Exp $")
 static char default_decoder_args[] = "-x " FILENAME_PLACEHOLDER " -";
 static char default_encoder_args[] = "- " FILENAME_PLACEHOLDER;
 
-format_module format_als = {
-  "als",
-  "MPEG-4 Audio Lossless Coding",
-  CVSIDSTR,
-  TRUE,
-  TRUE,
-  FALSE,
-  TRUE,
-  TRUE,
-  FALSE,
-  "-",
-  ALS_MAGIC,
-  0,
-  "als",
-  ALS,
-  default_decoder_args,
-  ALS,
-  default_encoder_args,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL
-};
+format_module format_als = {"als",
+                            "MPEG-4 Audio Lossless Coding",
+                            CVSIDSTR,
+                            TRUE,
+                            TRUE,
+                            FALSE,
+                            TRUE,
+                            TRUE,
+                            FALSE,
+                            "-",
+                            ALS_MAGIC,
+                            0,
+                            "als",
+                            ALS,
+                            default_decoder_args,
+                            ALS,
+                            default_encoder_args,
+                            NULL,
+                            NULL,
+                            NULL,
+                            NULL,
+                            NULL,
+                            NULL};

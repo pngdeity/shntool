@@ -13,7 +13,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 /*
@@ -24,20 +25,21 @@
 #define __CORE_H__
 
 /* program info */
-#define RELEASE   VERSION
+#define RELEASE VERSION
 #define COPYRIGHT "Copyright (C) 2000-2009"
-#define AUTHOR    "Jason Jordan <shnutils@freeshell.org>"
-#define URL1      "http://www.etree.org/shnutils/"
-#define URL2      "http://shnutils.freeshell.org/"
+#define AUTHOR "Jason Jordan <shnutils@freeshell.org>"
+#define URL1 "http://www.etree.org/shnutils/"
+#define URL2 "http://shnutils.freeshell.org/"
 
 /* options for core (non-mode) use */
-#define GLOBAL_OPTS_CORE   "afhjmv"
+#define GLOBAL_OPTS_CORE "afhjmv"
 
 /* options reserved for global use - modes cannot use these */
-#define GLOBAL_OPTS        "DF:HP:hi:qr:vw"
+#define GLOBAL_OPTS "DF:HP:hi:qr:vw"
 #define GLOBAL_OPTS_OUTPUT "O:a:d:o:z:"
 
-/* set this environment variable to enable debugging.  can also use -D, but this enables it earlier */
+/* set this environment variable to enable debugging.  can also use -D, but this
+ * enables it earlier */
 #define SHNTOOL_DEBUG_ENV "ST_DEBUG"
 
 /* various buffer sizes */
@@ -45,9 +47,9 @@
 #define MAX_FILENAMES 32768
 
 #ifdef HAVE_VSNPRINTF
-#define st_vsnprintf(a,b,c,d) vsnprintf(a,b,c,d)
+#define st_vsnprintf(a, b, c, d) vsnprintf(a, b, c, d)
 #else
-#define st_vsnprintf(a,b,c,d) vsprintf(a,c,d)
+#define st_vsnprintf(a, b, c, d) vsprintf(a, c, d)
 #endif
 
 #ifndef HAVE_STRERROR
@@ -57,11 +59,11 @@ extern char *sys_errlist[];
 
 /* macro for natural filename sorting */
 #ifndef PARAMS
-#  if defined PROTOTYPES || (defined __STDC__ && __STDC__)
-#    define PARAMS(Args) Args
-#  else
-#    define PARAMS(Args) ()
-#  endif
+#if defined PROTOTYPES || (defined __STDC__ && __STDC__)
+#define PARAMS(Args) Args
+#else
+#define PARAMS(Args) ()
+#endif
 #endif
 
 /* ID3v2 definitions */
@@ -92,11 +94,7 @@ typedef enum {
 } progress_types;
 
 /* argument sources */
-typedef enum {
-  ARGSRC_FORMAT,
-  ARGSRC_CMDLINE,
-  ARGSRC_ENV
-} argument_sources;
+typedef enum { ARGSRC_FORMAT, ARGSRC_CMDLINE, ARGSRC_ENV } argument_sources;
 
 /* input file sources */
 typedef enum {
@@ -112,31 +110,31 @@ extern format_module *st_formats[];
 
 /* private global options */
 typedef struct _private_opts {
-  char  *progname;
-  char  *progmode;
-  char   fullprogname[PROGNAME_SIZE];
-  int    debug_level;
-  int    clobber_action;
-  int    reorder_type;
-  int    progress_type;
-  bool   is_aliased;
-  bool   show_hmmss;
-  bool   suppress_warnings;
-  bool   suppress_stderr;
-  bool   screen_dirty;
+  char *progname;
+  char *progmode;
+  char fullprogname[PROGNAME_SIZE];
+  int debug_level;
+  int clobber_action;
+  int reorder_type;
+  int progress_type;
+  bool is_aliased;
+  bool show_hmmss;
+  bool suppress_warnings;
+  bool suppress_stderr;
+  bool screen_dirty;
   mode_module *mode;
 } private_opts;
 
 typedef struct _input_files {
-  int    type;
-  char  *filename_source;
-  FILE  *fd;
-  int    argn;
-  int    argc;
+  int type;
+  char *filename_source;
+  FILE *fd;
+  int argn;
+  int argc;
   char **argv;
-  int    filecur;
-  int    filemax;
-  char  *filenames[MAX_FILENAMES];
+  int filecur;
+  int filemax;
+  char *filenames[MAX_FILENAMES];
 } input_files;
 
 extern private_opts st_priv;

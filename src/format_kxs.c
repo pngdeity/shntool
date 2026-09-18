@@ -13,7 +13,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include "format.h"
@@ -26,28 +27,26 @@ CVSID("$Id: format_kxs.c,v 1.20 2009/03/11 17:18:01 jason Exp $")
 
 static char default_decoder_args[] = "-x -s " FILENAME_PLACEHOLDER;
 
-format_module format_kxs = {
-  "kxs",
-  "Kexis lossless WAV file compressor",
-  CVSIDSTR,
-  TRUE,
-  FALSE,
-  FALSE,
-  TRUE,
-  TRUE,
-  FALSE,
-  NULL,
-  KEXIS_MAGIC,
-  0,
-  "kxs",
-  KEXIS,
-  default_decoder_args,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL
-};
+format_module format_kxs = {"kxs",
+                            "Kexis lossless WAV file compressor",
+                            CVSIDSTR,
+                            TRUE,
+                            FALSE,
+                            FALSE,
+                            TRUE,
+                            TRUE,
+                            FALSE,
+                            NULL,
+                            KEXIS_MAGIC,
+                            0,
+                            "kxs",
+                            KEXIS,
+                            default_decoder_args,
+                            NULL,
+                            NULL,
+                            NULL,
+                            NULL,
+                            NULL,
+                            NULL,
+                            NULL,
+                            NULL};

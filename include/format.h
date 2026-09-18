@@ -13,7 +13,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 /*
@@ -29,22 +30,23 @@
 #define FILENAME_PLACEHOLDER "%f"
 
 /* copies an arbitrary-length tag, without the NULL byte */
-void tagcpy(unsigned char *,unsigned char *);
+void tagcpy(unsigned char *, unsigned char *);
 
 /* compares what was received to the expected tag */
-int tagcmp(unsigned char *,unsigned char *);
+int tagcmp(unsigned char *, unsigned char *);
 
-/* function to check if a file name is about to be clobbered, and if so, asks whether this is OK */
+/* function to check if a file name is about to be clobbered, and if so, asks
+ * whether this is OK */
 bool clobber_check(char *);
 
 /* find an output format module with the given name */
 format_module *find_format(char *);
 
 /* launch encoders/decoders */
-FILE *launch_input(format_module *,char *,proc_info *);
-FILE *launch_output(format_module *,char *,proc_info *);
+FILE *launch_input(format_module *, char *, proc_info *);
+FILE *launch_output(format_module *, char *, proc_info *);
 
 /* generic check for "magic" strings at known offsets */
-bool check_for_magic(char *,char *,int);
+bool check_for_magic(char *, char *, int);
 
 #endif

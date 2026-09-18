@@ -13,7 +13,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include <string.h>
@@ -21,42 +22,27 @@
 
 CVSID("$Id: format_null.c,v 1.44 2009/03/11 17:18:01 jason Exp $")
 
-static FILE *open_for_output(char *,proc_info *);
+static FILE *open_for_output(char *, proc_info *);
 static void create_output_filename(char *);
 
-format_module format_null = {
-  "null",
-  "Sends output to " NULLDEVICE,
-  CVSIDSTR,
-  FALSE,
-  TRUE,
-  FALSE,
-  FALSE,
-  FALSE,
-  FALSE,
-  NULL,
-  NULL,
-  0,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  open_for_output,
-  NULL,
-  create_output_filename,
-  NULL
-};
+format_module format_null = {"null",   "Sends output to " NULLDEVICE,
+                             CVSIDSTR, FALSE,
+                             TRUE,     FALSE,
+                             FALSE,    FALSE,
+                             FALSE,    NULL,
+                             NULL,     0,
+                             NULL,     NULL,
+                             NULL,     NULL,
+                             NULL,     NULL,
+                             NULL,     open_for_output,
+                             NULL,     create_output_filename,
+                             NULL};
 
-static FILE *open_for_output(char *filename,proc_info *pinfo)
-{
+static FILE *open_for_output(char *filename, proc_info *pinfo) {
   pinfo->pid = NO_CHILD_PID;
   return open_output(NULLDEVICE);
 }
 
-static void create_output_filename(char *outfilename)
-{
-  strcpy(outfilename,NULLDEVICE);
+static void create_output_filename(char *outfilename) {
+  strcpy(outfilename, NULLDEVICE);
 }

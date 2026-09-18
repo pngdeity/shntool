@@ -13,7 +13,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include <stdlib.h>
@@ -21,46 +22,42 @@
 
 CVSID("$Id: format_wav.c,v 1.61 2009/03/11 17:18:01 jason Exp $")
 
-static FILE *open_for_input(char *,proc_info *);
-static FILE *open_for_output(char *,proc_info *);
+static FILE *open_for_input(char *, proc_info *);
+static FILE *open_for_output(char *, proc_info *);
 static bool is_our_file(char *);
 
 #define WAVPACK_MAGIC "wvpk"
 
-format_module format_wav = {
-  "wav",
-  "RIFF WAVE file format",
-  CVSIDSTR,
-  TRUE,
-  TRUE,
-  FALSE,
-  FALSE,
-  TRUE,
-  FALSE,
-  NULL,
-  NULL,
-  0,
-  "wav",
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  is_our_file,
-  open_for_input,
-  open_for_output,
-  NULL,
-  NULL,
-  NULL
-};
+format_module format_wav = {"wav",
+                            "RIFF WAVE file format",
+                            CVSIDSTR,
+                            TRUE,
+                            TRUE,
+                            FALSE,
+                            FALSE,
+                            TRUE,
+                            FALSE,
+                            NULL,
+                            NULL,
+                            0,
+                            "wav",
+                            NULL,
+                            NULL,
+                            NULL,
+                            NULL,
+                            is_our_file,
+                            open_for_input,
+                            open_for_output,
+                            NULL,
+                            NULL,
+                            NULL};
 
-static FILE *open_for_input(char *filename,proc_info *pinfo)
-{
+static FILE *open_for_input(char *filename, proc_info *pinfo) {
   pinfo->pid = NO_CHILD_PID;
   return open_input(filename);
 }
 
-static FILE *open_for_output(char *filename,proc_info *pinfo)
-{
+static FILE *open_for_output(char *filename, proc_info *pinfo) {
   if (!clobber_check(filename))
     return NULL;
 
@@ -68,8 +65,7 @@ static FILE *open_for_output(char *filename,proc_info *pinfo)
   return open_output(filename);
 }
 
-static bool is_our_file(char *filename)
-{
+static bool is_our_file(char *filename) {
   wave_info *info;
   unsigned char buf[4];
 
@@ -91,8 +87,9 @@ static bool is_our_file(char *filename)
     return FALSE;
   }
 
-  /* WavPack header might follow RIFF header - make sure this isn't a WavPack file */
-  if (4 != fread(buf,1,4,info->input)) {
+  /* WavPack header might follow RIFF header - make sure this isn't a WavPack
+   * file */
+  if (4 != fread(buf, 1, 4, info->input)) {
     fclose(info->input);
     st_free(info);
     return TRUE;
@@ -101,7 +98,7 @@ static bool is_our_file(char *filename)
   fclose(info->input);
   st_free(info);
 
-  if (tagcmp(buf,(unsigned char *)WAVPACK_MAGIC))
+  if (tagcmp(buf, (unsigned char *)WAVPACK_MAGIC))
     return TRUE;
 
   /* it's not a WAVE */

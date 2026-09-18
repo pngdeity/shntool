@@ -13,7 +13,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include "format.h"
@@ -27,28 +28,26 @@ CVSID("$Id: format_flac.c,v 1.57 2009/03/11 17:18:01 jason Exp $")
 static char default_decoder_args[] = "-c -d -s " FILENAME_PLACEHOLDER;
 static char default_encoder_args[] = "-s -o " FILENAME_PLACEHOLDER " -";
 
-format_module format_flac = {
-  "flac",
-  "Free Lossless Audio Codec",
-  CVSIDSTR,
-  TRUE,
-  TRUE,
-  FALSE,
-  TRUE,
-  TRUE,
-  FALSE,
-  NULL,
-  FLAC_MAGIC,
-  0,
-  "flac",
-  FLAC,
-  default_decoder_args,
-  FLAC,
-  default_encoder_args,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL
-};
+format_module format_flac = {"flac",
+                             "Free Lossless Audio Codec",
+                             CVSIDSTR,
+                             TRUE,
+                             TRUE,
+                             FALSE,
+                             TRUE,
+                             TRUE,
+                             FALSE,
+                             NULL,
+                             FLAC_MAGIC,
+                             0,
+                             "flac",
+                             FLAC,
+                             default_decoder_args,
+                             FLAC,
+                             default_encoder_args,
+                             NULL,
+                             NULL,
+                             NULL,
+                             NULL,
+                             NULL,
+                             NULL};

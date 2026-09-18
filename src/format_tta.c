@@ -13,7 +13,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include "format.h"
@@ -27,28 +28,26 @@ CVSID("$Id: format_tta.c,v 1.24 2009/03/11 17:18:01 jason Exp $")
 static char default_decoder_args[] = "-d -o - " FILENAME_PLACEHOLDER;
 static char default_encoder_args[] = "-e -o " FILENAME_PLACEHOLDER " -";
 
-format_module format_tta = {
-  "tta",
-  "TTA Lossless Audio Codec",
-  CVSIDSTR,
-  TRUE,
-  TRUE,
-  FALSE,
-  TRUE,
-  TRUE,
-  TRUE,
-  NULL,
-  TTA_MAGIC,
-  0,
-  "tta",
-  TTA,
-  default_decoder_args,
-  TTA,
-  default_encoder_args,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL
-};
+format_module format_tta = {"tta",
+                            "TTA Lossless Audio Codec",
+                            CVSIDSTR,
+                            TRUE,
+                            TRUE,
+                            FALSE,
+                            TRUE,
+                            TRUE,
+                            TRUE,
+                            NULL,
+                            TTA_MAGIC,
+                            0,
+                            "tta",
+                            TTA,
+                            default_decoder_args,
+                            TTA,
+                            default_encoder_args,
+                            NULL,
+                            NULL,
+                            NULL,
+                            NULL,
+                            NULL,
+                            NULL};

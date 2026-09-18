@@ -13,7 +13,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 /*
@@ -45,10 +46,14 @@
 #undef max
 #endif
 
-#define min(x,y) ((x)<(y)?(x):(y))
-#define max(x,y) ((x)>(y)?(x):(y))
+#define min(x, y) ((x) < (y) ? (x) : (y))
+#define max(x, y) ((x) > (y) ? (x) : (y))
 
-#define st_free(x) if (x) { free(x); x = NULL; }
+#define st_free(x)                                                             \
+  if (x) {                                                                     \
+    free(x);                                                                   \
+    x = NULL;                                                                  \
+  }
 
 /* boolean definitions */
 #ifdef TRUE
@@ -59,32 +64,36 @@
 #undef FALSE
 #endif
 
-#define TRUE  (1==1)
-#define FALSE (0==1)
+#define TRUE (1 == 1)
+#define FALSE (0 == 1)
 
-/* function to open an input file for reading and skip past the ID3v2 tag, if one exists */
-FILE *open_input_internal(char *,bool *,wlong *);
-#define open_input(a) open_input_internal(a,NULL,NULL)
+/* function to open an input file for reading and skip past the ID3v2 tag, if
+ * one exists */
+FILE *open_input_internal(char *, bool *, wlong *);
+#define open_input(a) open_input_internal(a, NULL, NULL)
 
 /* function to open an output file for writing */
 FILE *open_output(char *);
 
-/* function to scan environment and return a pointer to the variable if it exists and is nonempty, otherwise returns NULL */
+/* function to scan environment and return a pointer to the variable if it
+ * exists and is nonempty, otherwise returns NULL */
 char *scan_env(char *);
 
-/* function to determine whether the data on the given file pointer contains an ID3v2 tag */
+/* function to determine whether the data on the given file pointer contains an
+ * ID3v2 tag */
 unsigned long check_for_id3v2_tag(FILE *);
 
 /* function to trim carriage returns and newlines from the end of strings */
 void trim(char *);
 
-/* function to return a pointer to the filename with all directory components removed */
+/* function to return a pointer to the filename with all directory components
+ * removed */
 char *basename(char *);
 
 /* function to return a pointer to the extension of a filename, if one exists */
 char *extname(char *);
 
 /* replacement snprintf */
-void st_snprintf(char *,int,char *,...);
+void st_snprintf(char *, int, char *, ...);
 
 #endif

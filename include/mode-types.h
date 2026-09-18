@@ -13,7 +13,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 /*
@@ -26,12 +27,12 @@
 #include "module-types.h"
 
 typedef struct _mode_module {
-  char  *const name;              /* mode name, specified on command line */
-  char  *const alias;             /* alternate name that invokes this mode */
-  char  *const description;       /* one line description of this mode */
-  char  *const cvsid;             /* CVS revision (used to prevent it from being stripped) */
-  bool  const creates_files;      /* does this mode create output files? */
-  bool (*run_main)(int,char **);  /* main() function for this mode */
+  char *const name;        /* mode name, specified on command line */
+  char *const alias;       /* alternate name that invokes this mode */
+  char *const description; /* one line description of this mode */
+  char *const cvsid; /* CVS revision (used to prevent it from being stripped) */
+  bool const creates_files;       /* does this mode create output files? */
+  bool (*run_main)(int, char **); /* main() function for this mode */
   void (*run_help)(void);         /* help() function for this mode */
 } mode_module;
 

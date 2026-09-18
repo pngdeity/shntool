@@ -13,26 +13,28 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include "shntool.h"
 
 CVSID("$Id: core_convert.c,v 1.21 2009/03/11 17:18:01 jason Exp $")
 
-unsigned long uchar_to_ulong_le(unsigned char * buf)
+unsigned long uchar_to_ulong_le(unsigned char *buf)
 /* converts 4 bytes stored in little-endian format to an unsigned long */
 {
-  return (unsigned long)(buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24));
+  return (unsigned long)(buf[0] | (buf[1] << 8) | (buf[2] << 16) |
+                         (buf[3] << 24));
 }
 
-unsigned short uchar_to_ushort_le(unsigned char * buf)
+unsigned short uchar_to_ushort_le(unsigned char *buf)
 /* converts 2 bytes stored in little-endian format to an unsigned short */
 {
   return (unsigned short)(buf[0] | (buf[1] << 8));
 }
 
-void ulong_to_uchar_le(unsigned char * buf,unsigned long num)
+void ulong_to_uchar_le(unsigned char *buf, unsigned long num)
 /* converts an unsigned long to 4 bytes stored in little-endian format */
 {
   buf[0] = (unsigned char)(num);
@@ -41,26 +43,27 @@ void ulong_to_uchar_le(unsigned char * buf,unsigned long num)
   buf[3] = (unsigned char)(num >> 24);
 }
 
-void ushort_to_uchar_le(unsigned char * buf,unsigned short num)
+void ushort_to_uchar_le(unsigned char *buf, unsigned short num)
 /* converts an unsigned short to 2 bytes stored in little-endian format */
 {
   buf[0] = (unsigned char)(num);
   buf[1] = (unsigned char)(num >> 8);
 }
 
-unsigned long uchar_to_ulong_be(unsigned char * buf)
+unsigned long uchar_to_ulong_be(unsigned char *buf)
 /* converts 4 bytes stored in big-endian format to an unsigned long */
 {
-  return (unsigned long)((buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3]);
+  return (unsigned long)((buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) |
+                         buf[3]);
 }
 
-unsigned short uchar_to_ushort_be(unsigned char * buf)
+unsigned short uchar_to_ushort_be(unsigned char *buf)
 /* converts 2 bytes stored in big-endian format to an unsigned short */
 {
   return (unsigned short)((buf[0] << 8) | buf[1]);
 }
 
-void ulong_to_uchar_be(unsigned char * buf,unsigned long num)
+void ulong_to_uchar_be(unsigned char *buf, unsigned long num)
 /* converts an unsigned long to 4 bytes stored in big-endian format */
 {
   buf[0] = (unsigned char)(num >> 24);
@@ -69,7 +72,7 @@ void ulong_to_uchar_be(unsigned char * buf,unsigned long num)
   buf[3] = (unsigned char)(num);
 }
 
-void ushort_to_uchar_be(unsigned char * buf,unsigned short num)
+void ushort_to_uchar_be(unsigned char *buf, unsigned short num)
 /* converts an unsigned short to 2 bytes stored in big-endian format */
 {
   buf[0] = (unsigned char)(num >> 8);
@@ -79,5 +82,6 @@ void ushort_to_uchar_be(unsigned char * buf,unsigned short num)
 unsigned long synchsafe_int_to_ulong(unsigned char *buf)
 /* converts 4 bytes stored in synchsafe integer format to an unsigned long */
 {
-  return (unsigned long)(((buf[0] & 0x7f) << 21) | ((buf[1] & 0x7f) << 14) | ((buf[2] & 0x7f) << 7) | (buf[3] & 0x7f));
+  return (unsigned long)(((buf[0] & 0x7f) << 21) | ((buf[1] & 0x7f) << 14) |
+                         ((buf[2] & 0x7f) << 7) | (buf[3] & 0x7f));
 }

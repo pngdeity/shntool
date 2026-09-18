@@ -13,34 +13,33 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include "mode.h"
 
 CVSID("$Id: mode_strip.c,v 1.105 2009/03/17 17:23:05 jason Exp $")
 
-static bool strip_main(int,char **);
+static bool strip_main(int, char **);
 static void strip_help(void);
 
 mode_module mode_strip = {
-  "strip",
-  "shnstrip",
-  "Strips extra RIFF chunks and/or writes canonical headers",
-  CVSIDSTR,
-  TRUE,
-  strip_main,
-  strip_help
-};
+    "strip",
+    "shnstrip",
+    "Strips extra RIFF chunks and/or writes canonical headers",
+    CVSIDSTR,
+    TRUE,
+    strip_main,
+    strip_help};
 
 #define STRIP_POSTFIX "-stripped"
 
 static bool strip_header = TRUE;
 static bool strip_chunks = TRUE;
 
-static void strip_help()
-{
-  st_info("Usage: %s [OPTIONS] [files]\n",st_progname());
+static void strip_help() {
+  st_info("Usage: %s [OPTIONS] [files]\n", st_progname());
   st_info("\n");
   st_info("Mode-specific options:\n");
   st_info("\n");
@@ -50,21 +49,20 @@ static void strip_help()
   st_info("\n");
 }
 
-static void parse(int argc,char **argv,int *first_arg)
-{
+static void parse(int argc, char **argv, int *first_arg) {
   int c;
 
   st_ops.output_directory = INPUT_FILE_DIR;
   st_ops.output_postfix = STRIP_POSTFIX;
 
-  while ((c = st_getopt(argc,argv,"ce")) != -1) {
+  while ((c = st_getopt(argc, argv, "ce")) != -1) {
     switch (c) {
-      case 'c':
-        strip_chunks = FALSE;
-        break;
-      case 'e':
-        strip_header = FALSE;
-        break;
+    case 'c':
+      strip_chunks = FALSE;
+      break;
+    case 'e':
+      strip_header = FALSE;
+      break;
     }
   }
 
@@ -74,8 +72,7 @@ static void parse(int argc,char **argv,int *first_arg)
   *first_arg = optind;
 }
 
-static bool strip_and_canonicize(wave_info *info)
-{
+static bool strip_and_canonicize(wave_info *info) {
   wint new_header_size;
   wlong new_chunk_size;
   unsigned char *header = NULL;
@@ -83,12 +80,13 @@ static bool strip_and_canonicize(wave_info *info)
   FILE *output = NULL;
   proc_info output_proc;
   long possible_extra_stuff;
-  bool has_null_pad,success;
+  bool has_null_pad, success;
   progress_info proginfo;
 
   success = FALSE;
 
-  create_output_filename(info->filename,info->input_format->extension,outfilename);
+  create_output_filename(info->filename, info->input_format->extension,
+                         outfilename);
 
   proginfo.initialized = FALSE;
   proginfo.prefix = "Stripping";
@@ -113,9 +111,11 @@ static bool strip_and_canonicize(wave_info *info)
     return FALSE;
   }
 
-  if (strip_header && strip_chunks && !PROB_EXTRA_CHUNKS(info) && !PROB_HDR_NOT_CANONICAL(info)) {
+  if (strip_header && strip_chunks && !PROB_EXTRA_CHUNKS(info) &&
+      !PROB_HDR_NOT_CANONICAL(info)) {
     prog_error(&proginfo);
-    st_warning("file already has a canonical header and no extra RIFF chunks -- skipping.");
+    st_warning("file already has a canonical header and no extra RIFF chunks "
+               "-- skipping.");
     return FALSE;
   }
 
@@ -131,7 +131,7 @@ static bool strip_and_canonicize(wave_info *info)
     return FALSE;
   }
 
-  if (files_are_identical(info->filename,outfilename)) {
+  if (files_are_identical(info->filename, outfilename)) {
     prog_error(&proginfo);
     st_warning("output file would overwrite input file -- skipping.");
     return FALSE;
@@ -143,7 +143,8 @@ static bool strip_and_canonicize(wave_info *info)
     info->extra_riff_size++;
 
   new_header_size = info->header_size;
-  possible_extra_stuff = (info->extra_riff_size > 0) ? info->extra_riff_size : 0;
+  possible_extra_stuff =
+      (info->extra_riff_size > 0) ? info->extra_riff_size : 0;
 
   if (strip_header)
     new_header_size = CANONICAL_HEADER_SIZE;
@@ -151,7 +152,8 @@ static bool strip_and_canonicize(wave_info *info)
   if (strip_chunks)
     possible_extra_stuff = 0;
 
-  new_chunk_size = info->chunk_size - (info->header_size - new_header_size) - (info->extra_riff_size - possible_extra_stuff);
+  new_chunk_size = info->chunk_size - (info->header_size - new_header_size) -
+                   (info->extra_riff_size - possible_extra_stuff);
 
   if (!open_input_stream(info)) {
     prog_error(&proginfo);
@@ -159,7 +161,7 @@ static bool strip_and_canonicize(wave_info *info)
     return FALSE;
   }
 
-  if (NULL == (output = open_output_stream(outfilename,&output_proc))) {
+  if (NULL == (output = open_output_stream(outfilename, &output_proc))) {
     prog_error(&proginfo);
     st_warning("could not open output file -- skipping.");
     goto cleanup;
@@ -167,43 +169,54 @@ static bool strip_and_canonicize(wave_info *info)
 
   if (NULL == (header = malloc(info->header_size * sizeof(unsigned char)))) {
     prog_error(&proginfo);
-    st_warning("could not allocate %d-byte WAVE header -- skipping.",info->header_size);
+    st_warning("could not allocate %d-byte WAVE header -- skipping.",
+               info->header_size);
     goto cleanup;
   }
 
-  if (read_n_bytes(info->input,header,info->header_size,NULL) != info->header_size) {
+  if (read_n_bytes(info->input, header, info->header_size, NULL) !=
+      info->header_size) {
     prog_error(&proginfo);
-    st_warning("error while reading %d bytes of data -- skipping.",info->header_size);
+    st_warning("error while reading %d bytes of data -- skipping.",
+               info->header_size);
     goto cleanup;
   }
 
-  /* already read in header, now check to see if we need to overwrite that with a canonical one */
+  /* already read in header, now check to see if we need to overwrite that with
+   * a canonical one */
   if (strip_header)
-    make_canonical_header(header,info);
+    make_canonical_header(header, info);
 
-  put_chunk_size(header,new_chunk_size);
+  put_chunk_size(header, new_chunk_size);
 
-  if (write_n_bytes(output,header,new_header_size,NULL) != new_header_size) {
+  if (write_n_bytes(output, header, new_header_size, NULL) != new_header_size) {
     prog_error(&proginfo);
-    st_warning("error while writing %d bytes of data -- skipping.",new_header_size);
+    st_warning("error while writing %d bytes of data -- skipping.",
+               new_header_size);
     goto cleanup;
   }
 
-  if (transfer_n_bytes(info->input,output,info->data_size,NULL) != info->data_size) {
+  if (transfer_n_bytes(info->input, output, info->data_size, NULL) !=
+      info->data_size) {
     prog_error(&proginfo);
-    st_warning("error while transferring %lu bytes of data -- skipping.",info->data_size);
+    st_warning("error while transferring %lu bytes of data -- skipping.",
+               info->data_size);
     goto cleanup;
   }
 
-  if (PROB_ODD_SIZED_DATA(info) && has_null_pad && (1 != transfer_n_bytes(info->input,output,1,NULL))) {
+  if (PROB_ODD_SIZED_DATA(info) && has_null_pad &&
+      (1 != transfer_n_bytes(info->input, output, 1, NULL))) {
     prog_error(&proginfo);
     st_warning("error while transferring NULL pad byte -- skipping.");
     goto cleanup;
   }
 
-  if ((possible_extra_stuff > 0) && (transfer_n_bytes(info->input,output,possible_extra_stuff,NULL) != possible_extra_stuff)) {
+  if ((possible_extra_stuff > 0) &&
+      (transfer_n_bytes(info->input, output, possible_extra_stuff, NULL) !=
+       possible_extra_stuff)) {
     prog_error(&proginfo);
-    st_warning("error while transferring %lu extra bytes -- skipping.",possible_extra_stuff);
+    st_warning("error while transferring %lu extra bytes -- skipping.",
+               possible_extra_stuff);
     goto cleanup;
   }
 
@@ -214,7 +227,9 @@ static bool strip_and_canonicize(wave_info *info)
 cleanup:
   st_free(header);
 
-  if ((output) && ((CLOSE_CHILD_ERROR_OUTPUT == close_output(output,output_proc)) || !success)) {
+  if ((output) &&
+      ((CLOSE_CHILD_ERROR_OUTPUT == close_output(output, output_proc)) ||
+       !success)) {
     success = FALSE;
     remove_file(outfilename);
   }
@@ -224,8 +239,7 @@ cleanup:
   return success;
 }
 
-static bool process_file(char *filename)
-{
+static bool process_file(char *filename) {
   wave_info *info;
   bool success;
 
@@ -239,14 +253,13 @@ static bool process_file(char *filename)
   return success;
 }
 
-static bool process(int argc,char **argv,int start)
-{  
+static bool process(int argc, char **argv, int start) {
   char *filename;
   bool success;
 
   success = TRUE;
 
-  input_init(start,argc,argv);
+  input_init(start, argc, argv);
 
   while ((filename = input_get_filename())) {
     success = (process_file(filename) && success);
@@ -255,11 +268,10 @@ static bool process(int argc,char **argv,int start)
   return success;
 }
 
-static bool strip_main(int argc,char **argv)
-{
+static bool strip_main(int argc, char **argv) {
   int first_arg;
 
-  parse(argc,argv,&first_arg);
+  parse(argc, argv, &first_arg);
 
-  return process(argc,argv,first_arg);
+  return process(argc, argv, first_arg);
 }

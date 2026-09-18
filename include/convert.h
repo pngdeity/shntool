@@ -13,7 +13,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 /*
@@ -30,10 +31,10 @@ unsigned long uchar_to_ulong_le(unsigned char *);
 unsigned short uchar_to_ushort_le(unsigned char *);
 
 /* converts an unsigned long to 4 bytes stored in little-endian format */
-void ulong_to_uchar_le(unsigned char *,unsigned long);
+void ulong_to_uchar_le(unsigned char *, unsigned long);
 
 /* converts an unsigned short to 2 bytes stored in little-endian format */
-void ushort_to_uchar_le(unsigned char *,unsigned short);
+void ushort_to_uchar_le(unsigned char *, unsigned short);
 
 /* converts 4 bytes stored in big-endian format to an unsigned long */
 unsigned long uchar_to_ulong_be(unsigned char *);
@@ -42,10 +43,10 @@ unsigned long uchar_to_ulong_be(unsigned char *);
 unsigned short uchar_to_ushort_be(unsigned char *);
 
 /* converts an unsigned long to 4 bytes stored in big-endian format */
-void ulong_to_uchar_be(unsigned char *,unsigned long);
+void ulong_to_uchar_be(unsigned char *, unsigned long);
 
 /* converts an unsigned short to 2 bytes stored in big-endian format */
-void ushort_to_uchar_be(unsigned char *,unsigned short);
+void ushort_to_uchar_be(unsigned char *, unsigned short);
 
 /* converts 4 bytes stored in synchsafe integer format to an unsigned long */
 unsigned long synchsafe_int_to_ulong(unsigned char *);

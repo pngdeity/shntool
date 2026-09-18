@@ -18,6 +18,18 @@ meson test -C build
 The build treats warnings as errors by default. Disable that for exploratory
 work with `-Dwerror=false`.
 
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on pushes to `main` and on pull requests:
+
+- `build-test` (GCC and Clang): builds a reference from the `upstream-3.0.10`
+  tag and runs the unit, smoke, and differential tests against it.
+- `fuzz` (Clang): sanitizer build with the bounded libFuzzer regression runs.
+- `subset`: a reduced `-Dmodes=len,info -Dformats=wav` build and its unit tests.
+- `lint`: REUSE compliance (required) and clang-format (advisory).
+
+PRs are expected to keep the pipeline green.
+
 ## Style
 
 - Formatting is enforced by clang-format using `.clang-format` (LLVM base,

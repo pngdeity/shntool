@@ -73,7 +73,8 @@ itself, whose error paths intentionally abandon state.
 
 The pristine 3.0.10 tree is preserved under the `upstream-3.0.10` tag. It does
 not compile on modern compilers without the C23 fixes, so build it with the
-GNU89 dialect:
+GNU89 dialect. CI does this automatically for every `build-test` job, so the
+steps below are only needed locally:
 
 ```sh
 git archive -o /tmp/upstream.tar upstream-3.0.10

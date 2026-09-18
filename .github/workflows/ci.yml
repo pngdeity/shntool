@@ -1,0 +1,156 @@
+# CI for shntool.
+#
+# Jobs:
+#   build-test  - GCC and Clang builds; unit, smoke, and differential tests
+#                 against a reference built from the upstream-3.0.10 tag.
+#   fuzz        - Clang sanitizer build; bounded libFuzzer regression runs.
+#   subset      - a reduced -Dmodes=/-Dformats= configuration still builds and
+#                 its unit tests pass.
+#   lint        - REUSE compliance (blocking) and clang-format (advisory).
+#
+# The differential oracle ships its own generated ./configure, so the reference
+# needs only make and a C compiler -- no autotools bootstrap.
+#
+# Follow-up: pin actions to commit SHAs once the pipeline is stable.
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build-test:
+    name: build & test (${{ matrix.cc }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        cc: [gcc, clang]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install Meson and Ninja
+        run: |
+          uv tool install meson
+          uv tool install ninja
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Ensure clang is available
+        run: |
+          if ! command -v clang >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y clang
+          fi
+      - name: Cache Meson subprojects
+        uses: actions/cache@v4
+        with:
+          path: subprojects/packagecache
+          key: subprojects-${{ runner.os }}-${{ hashFiles('subprojects/*.wrap') }}
+          restore-keys: subprojects-${{ runner.os }}-
+      - name: Build upstream reference
+        run: |
+          git archive -o /tmp/upstream.tar upstream-3.0.10
+          mkdir -p /tmp/upstream
+          tar -xf /tmp/upstream.tar -C /tmp/upstream
+          cd /tmp/upstream
+          ./configure CFLAGS="-g -O2 -std=gnu89"
+          make -j"$(nproc)"
+      - name: Configure
+        env:
+          CC: ${{ matrix.cc }}
+        run: meson setup build -Dreference-shntool=/tmp/upstream/src/shntool
+      - name: Build
+        run: meson compile -C build
+      - name: Test
+        run: meson test -C build --print-errorlogs
+  fuzz:
+    name: fuzz build (clang, sanitizers)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install Meson and Ninja
+        run: |
+          uv tool install meson
+          uv tool install ninja
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Ensure clang is available
+        run: |
+          if ! command -v clang >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y clang
+          fi
+      - name: Cache Meson subprojects
+        uses: actions/cache@v4
+        with:
+          path: subprojects/packagecache
+          key: subprojects-${{ runner.os }}-${{ hashFiles('subprojects/*.wrap') }}
+          restore-keys: subprojects-${{ runner.os }}-
+      - name: Configure
+        run: CC=clang meson setup build-fuzz -Dfuzz=true
+      - name: Build
+        run: meson compile -C build-fuzz
+      - name: Test
+        run: meson test -C build-fuzz --print-errorlogs
+  subset:
+    name: reduced configuration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install Meson and Ninja
+        run: |
+          uv tool install meson
+          uv tool install ninja
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Cache Meson subprojects
+        uses: actions/cache@v4
+        with:
+          path: subprojects/packagecache
+          key: subprojects-${{ runner.os }}-${{ hashFiles('subprojects/*.wrap') }}
+          restore-keys: subprojects-${{ runner.os }}-
+      - name: Configure (len,info + wav only)
+        run: meson setup build-sub -Dmodes=len,info -Dformats=wav
+      - name: Build
+        run: meson compile -C build-sub
+      - name: Unit tests
+        run: >
+          meson test -C build-sub --print-errorlogs unit-convert unit-module unit-string unit-mode unit-wave
+
+  lint:
+    name: lint (reuse, format)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: REUSE compliance
+        uses: fsfe/reuse-action@v5
+      - name: clang-format (advisory)
+        continue-on-error: true
+        run: |
+          if ! command -v clang-format >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y clang-format
+          fi
+          find include src test -type f \( -name '*.c' -o -name '*.h' \) -print0 \
+            | xargs -0 clang-format --dry-run --Werror

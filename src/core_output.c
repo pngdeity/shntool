@@ -61,7 +61,7 @@ static void print_prefix() {
 }
 
 static void print_msgtype(char *msgtype, int line) {
-  int i;
+  size_t i;
 
   if (0 == line) {
     fprintf(stderr, "%s", msgtype);
@@ -75,6 +75,7 @@ static void print_lines(char *msgtype, char *msg) {
   int line = 0;
   char *head, *tail;
 
+  (void)msg;
   head = tail = msgbuf;
   while (*head) {
     if ('\n' == *head) {

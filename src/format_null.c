@@ -39,6 +39,7 @@ format_module format_null = {"null",   "Sends output to " NULLDEVICE,
                              NULL};
 
 static FILE *open_for_output(char *filename, proc_info *pinfo) {
+  (void)filename;
   pinfo->pid = NO_CHILD_PID;
   return open_output(NULLDEVICE);
 }

@@ -183,6 +183,8 @@ int md5_stream(FILE *stream, void *resblock) {
   size_t sum;
   unsigned long totalbytes = 0; /* shntool */
 
+  (void)resblock; /* result is finalized by the caller */
+
   /* shntool: */
   if (0 == maxbytes)
     return 0;
@@ -614,6 +616,8 @@ void *sha1_finish_ctx(struct sha1_ctx *ctx, void *resbuf) {
 int sha1_stream(FILE *stream, void *resblock) {
   size_t sum;
   unsigned long totalbytes = 0; /* shntool */
+
+  (void)resblock; /* result is finalized by the caller */
 
   /* shntool: */
   if (0 == maxbytes)
@@ -1130,11 +1134,11 @@ static bool generate_audio_hash_composite(wave_info *info) {
    * from this file to fill it out and process it.
    */
   if (remaining_bytes > 0) {
-    bytes_to_read = min(info->data_size, BLOCKSIZE - remaining_bytes);
+    bytes_to_read = min(info->data_size, (wlong)(BLOCKSIZE - remaining_bytes));
 
     if (read_n_bytes(info->input,
                      (unsigned char *)(global_buffer + remaining_bytes),
-                     bytes_to_read, NULL) != bytes_to_read)
+                     bytes_to_read, NULL) != (wlong)bytes_to_read)
       st_error("error while filling out block with data from file: [%s]",
                info->filename);
 

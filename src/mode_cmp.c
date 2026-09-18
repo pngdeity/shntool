@@ -191,7 +191,8 @@ static bool cmp_files(wave_info *info1, wave_info *info2, int shift) {
   discard_header(info2);
 
   if (shift > 0) {
-    if (read_n_bytes(info1->input, buf1, real_shift, NULL) != real_shift) {
+    if (read_n_bytes(info1->input, buf1, real_shift, NULL) !=
+        (wlong)real_shift) {
       prog_error(&proginfo);
       st_error("error while shifting %d bytes from file: [%s]", real_shift,
                info1->filename);
@@ -199,7 +200,8 @@ static bool cmp_files(wave_info *info1, wave_info *info2, int shift) {
 
     shifted_data_size1 -= real_shift;
   } else if (shift < 0) {
-    if (read_n_bytes(info2->input, buf2, real_shift, NULL) != real_shift) {
+    if (read_n_bytes(info2->input, buf2, real_shift, NULL) !=
+        (wlong)real_shift) {
       prog_error(&proginfo);
       st_error("error while shifting %d bytes from file: [%s]", real_shift,
                info2->filename);
@@ -216,13 +218,13 @@ static bool cmp_files(wave_info *info1, wave_info *info2, int shift) {
 
   while (bytes_to_check > 0) {
     bytes = min(bytes_to_check, xfer_size);
-    if (read_n_bytes(info1->input, buf1, (int)bytes, &proginfo) != (int)bytes) {
+    if (read_n_bytes(info1->input, buf1, bytes, &proginfo) != bytes) {
       prog_error(&proginfo);
       st_error("error while reading %d bytes from file: [%s]", (int)bytes,
                info1->filename);
     }
 
-    if (read_n_bytes(info2->input, buf2, (int)bytes, NULL) != (int)bytes) {
+    if (read_n_bytes(info2->input, buf2, bytes, NULL) != bytes) {
       prog_error(&proginfo);
       st_error("error while reading %d bytes from file: [%s]", (int)bytes,
                info2->filename);
@@ -285,7 +287,7 @@ static void open_and_read_beginning(wave_info *info, unsigned char *buf,
 
   discard_header(info);
 
-  if (read_n_bytes(info->input, buf, (int)bytes, NULL) != (int)bytes)
+  if (read_n_bytes(info->input, buf, bytes, NULL) != (wlong)bytes)
     st_error("error while reading %d bytes from file: [%s]", (int)bytes,
              info->filename);
 
@@ -323,7 +325,7 @@ static bool shift_comparison(wave_info *info1, wave_info *info2) {
   open_and_read_beginning(info1, buf1, bytes);
   open_and_read_beginning(info2, buf2, bytes);
 
-  for (i = 0; i < bytes - CMP_MATCH_SIZE + 1; i++) {
+  for (i = 0; (wlong)i < bytes - CMP_MATCH_SIZE + 1; i++) {
     if (-1 == memfuzzycmp(buf1 + i, buf2, bytes - i, fuzz)) {
       shift = i;
       real_shift = i;

@@ -187,9 +187,9 @@ static bool cat_file(wave_info *info) {
   }
 
   if (cat_extra && PROB_EXTRA_CHUNKS(info)) {
-    if (info->extra_riff_size != transfer_n_bytes(info->input, stdout,
-                                                  info->extra_riff_size,
-                                                  &proginfo)) {
+    if ((unsigned long)info->extra_riff_size !=
+        transfer_n_bytes(info->input, stdout, info->extra_riff_size,
+                         &proginfo)) {
       prog_error(&proginfo);
       st_error("error while transferring %lu extra bytes",
                info->extra_riff_size);

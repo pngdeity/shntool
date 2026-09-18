@@ -1013,7 +1013,7 @@ void alter_file_order(wave_info **filenames, int numfiles)
     st_info("  [q]uit       (quits %s [you can also use Ctrl-C])\n",
             st_priv.progname);
     st_info("\n? ");
-    fgets(response, BUF_SIZE - 1, stdin);
+    (void)!fgets(response, BUF_SIZE - 1, stdin);
     if (feof(stdin))
       strcpy(response, "done");
     trim(response);
@@ -1152,19 +1152,19 @@ wlong smrt_parse(unsigned char *data, wave_info *info)
   strcpy((char *)tmp, (const char *)data);
 
   /* check for all digits */
-  if (-1 != (bytes = is_numeric(tmp)))
+  if ((wlong)-1 != (bytes = is_numeric(tmp)))
     return bytes;
 
   /* check for m:ss */
-  if (-1 != (bytes = is_m_ss(tmp, info)))
+  if ((wlong)-1 != (bytes = is_m_ss(tmp, info)))
     return bytes;
 
   /* check for m:ss.ff */
-  if (-1 != (bytes = is_m_ss_ff(tmp, info)))
+  if ((wlong)-1 != (bytes = is_m_ss_ff(tmp, info)))
     return bytes;
 
   /* check for m:ss.nnn */
-  if (-1 != (bytes = is_m_ss_nnn(tmp, info)))
+  if ((wlong)-1 != (bytes = is_m_ss_nnn(tmp, info)))
     return bytes;
 
   /* it was not in any of these formats */
@@ -1704,7 +1704,7 @@ char *input_get_filename() {
 
   case INPUT_STDIN:
   case INPUT_FILE:
-    fgets(internal_filename, FILENAME_SIZE - 1, st_input.fd);
+    (void)!fgets(internal_filename, FILENAME_SIZE - 1, st_input.fd);
     if (!feof(st_input.fd)) {
       trim(internal_filename);
       filename = internal_filename;

@@ -28,13 +28,13 @@
 #include "mode-types.h"
 
 /* writes the specified number of zero bytes to the file descriptor given */
-int write_padding(FILE *, int, progress_info *);
+wlong write_padding(FILE *, int, progress_info *);
 
 /* reads n bytes from a file into a buffer */
-int read_n_bytes(FILE *, unsigned char *, int, progress_info *);
+wlong read_n_bytes(FILE *, unsigned char *, wlong, progress_info *);
 
 /* writes n bytes from a buffer into a file */
-int write_n_bytes(FILE *, unsigned char *, int, progress_info *);
+wlong write_n_bytes(FILE *, unsigned char *, wlong, progress_info *);
 
 /* transfers n bytes from a file into another file */
 unsigned long transfer_n_bytes_internal(FILE *, FILE *, FILE *, unsigned long,

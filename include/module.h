@@ -30,8 +30,15 @@
 #include "wave.h"
 #include "module-types.h"
 
+/* portability helper for intentionally unused symbols */
+#if defined(__GNUC__)
+#define ST_UNUSED __attribute__((unused))
+#else
+#define ST_UNUSED
+#endif
+
 /* macro to set cvsid string */
-#define CVSID(x) static const char cvsid[] = x;
+#define CVSID(x) static const char cvsid[] ST_UNUSED = x;
 #define CVSIDSTR ((char *const)&cvsid)
 
 /* misc definitions */

@@ -152,7 +152,7 @@ static bool do_join() {
   }
 
   if (all_files_cd_quality && (JOIN_PREPAD == pad_type) && pad_bytes) {
-    if (pad_bytes != write_padding(output, pad_bytes, &proginfo)) {
+    if ((wlong)pad_bytes != write_padding(output, pad_bytes, &proginfo)) {
       prog_error(&proginfo);
       st_warning("error while pre-padding with %d zero-bytes", pad_bytes);
       goto cleanup;
@@ -176,7 +176,7 @@ static bool do_join() {
     while (bytes_to_skip > 0) {
       bytes_to_xfer = min(bytes_to_skip, CANONICAL_HEADER_SIZE);
       if (read_n_bytes(files[i]->input, header, bytes_to_xfer, NULL) !=
-          bytes_to_xfer) {
+          (wlong)bytes_to_xfer) {
         prog_error(&proginfo);
         st_warning("error while reading %d bytes of data", bytes_to_xfer);
         goto cleanup;
@@ -198,7 +198,7 @@ static bool do_join() {
   }
 
   if (all_files_cd_quality && JOIN_POSTPAD == pad_type && pad_bytes) {
-    if (pad_bytes != write_padding(output, pad_bytes, NULL)) {
+    if ((wlong)pad_bytes != write_padding(output, pad_bytes, NULL)) {
       prog_error(&proginfo);
       st_warning("error while post-padding with %d zero-bytes", pad_bytes);
       goto cleanup;

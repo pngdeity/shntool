@@ -213,7 +213,7 @@ static bool strip_and_canonicize(wave_info *info) {
 
   if ((possible_extra_stuff > 0) &&
       (transfer_n_bytes(info->input, output, possible_extra_stuff, NULL) !=
-       possible_extra_stuff)) {
+       (unsigned long)possible_extra_stuff)) {
     prog_error(&proginfo);
     st_warning("error while transferring %lu extra bytes -- skipping.",
                possible_extra_stuff);

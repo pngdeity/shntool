@@ -233,7 +233,7 @@ static bool is_our_file(char *filename) {
 
     remaining_bytes = sizeof(WavpackHeader4) - WV_COMMON_HEADER_SIZE;
     if (fread(wph + WV_COMMON_HEADER_SIZE, 1, remaining_bytes, info->input) !=
-        remaining_bytes) {
+        (size_t)remaining_bytes) {
       fclose(info->input);
       st_free(info);
       return FALSE;
@@ -283,7 +283,7 @@ static bool is_our_file(char *filename) {
 
   remaining_bytes = sizeof(WavpackHeader3) - WV_COMMON_HEADER_SIZE;
   if (fread(wph + WV_COMMON_HEADER_SIZE, 1, remaining_bytes, info->input) !=
-      remaining_bytes) {
+      (size_t)remaining_bytes) {
     fclose(info->input);
     st_free(info);
     return FALSE;

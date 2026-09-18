@@ -22,13 +22,14 @@
 
 CVSID("$Id: core_fileio.c,v 1.44 2009/03/11 17:18:01 jason Exp $")
 
-int read_n_bytes(FILE *in, unsigned char *buf, int num, progress_info *proginfo)
+wlong read_n_bytes(FILE *in, unsigned char *buf, wlong num,
+                   progress_info *proginfo)
 /* reads the specified number of bytes from the file descriptor 'in' into buf */
 {
-  int read;
+  wlong read;
 
   if ((read = fread(buf, 1, num, in)) != num) {
-    st_debug1("tried to read %d bytes, but only read %d -- possible "
+    st_debug1("tried to read %lu bytes, but only read %lu -- possible "
               "truncated/corrupt file",
               num, read);
   }
@@ -41,20 +42,21 @@ int read_n_bytes(FILE *in, unsigned char *buf, int num, progress_info *proginfo)
   return read;
 }
 
-int write_n_bytes(FILE *out, unsigned char *buf, int num,
-                  progress_info *proginfo)
+wlong write_n_bytes(FILE *out, unsigned char *buf, wlong num,
+                    progress_info *proginfo)
 /* writes the specified number of bytes from buf into the file descriptor 'out'
  */
 {
-  int wrote;
+  wlong wrote;
 
   if ((wrote = fwrite(buf, 1, num, out)) != num) {
-    st_debug1("tried to write %d bytes, but only wrote %d -- make sure that:\n"
-              "+ there is enough disk space\n"
-              "+ the specified output directory exists\n"
-              "+ you have permission to create files in the output directory\n"
-              "+ the output format's encoder is installed and in your PATH",
-              num, wrote);
+    st_debug1(
+        "tried to write %lu bytes, but only wrote %lu -- make sure that:\n"
+        "+ there is enough disk space\n"
+        "+ the specified output directory exists\n"
+        "+ you have permission to create files in the output directory\n"
+        "+ the output format's encoder is installed and in your PATH",
+        num, wrote);
   }
 
   if (proginfo) {
@@ -71,18 +73,18 @@ unsigned long transfer_n_bytes_internal(FILE *in, FILE *out1, FILE *out2,
 /* transfers 'bytes' bytes from file descriptor 'in' to file descriptor 'out' */
 {
   unsigned char buf[XFER_SIZE];
-  int bytes_to_xfer, actual_bytes_read, actual_bytes_written1,
+  wlong bytes_to_xfer, actual_bytes_read, actual_bytes_written1,
       actual_bytes_written2;
   unsigned long total_bytes_to_xfer = bytes, total_bytes_xfered = 0;
 
   while (total_bytes_to_xfer > 0) {
-    bytes_to_xfer = min(total_bytes_to_xfer, XFER_SIZE);
+    bytes_to_xfer = min(total_bytes_to_xfer, (unsigned long)XFER_SIZE);
     actual_bytes_read = read_n_bytes(in, buf, bytes_to_xfer, NULL);
     actual_bytes_written1 =
         write_n_bytes(out1, buf, actual_bytes_read, proginfo);
     actual_bytes_written2 =
         (out2) ? write_n_bytes(out2, buf, actual_bytes_read, NULL) : 0;
-    total_bytes_xfered += (unsigned long)actual_bytes_written1;
+    total_bytes_xfered += actual_bytes_written1;
     if (actual_bytes_read != bytes_to_xfer ||
         actual_bytes_written1 != bytes_to_xfer ||
         (out2 && actual_bytes_written2 != bytes_to_xfer))
@@ -93,7 +95,7 @@ unsigned long transfer_n_bytes_internal(FILE *in, FILE *out1, FILE *out2,
   return total_bytes_xfered;
 }
 
-int write_padding(FILE *out, int bytes, progress_info *proginfo)
+wlong write_padding(FILE *out, int bytes, progress_info *proginfo)
 /* writes the specified number of zero bytes to the file descriptor given */
 {
   unsigned char silence[CD_BLOCK_SIZE];
@@ -105,7 +107,7 @@ int write_padding(FILE *out, int bytes, progress_info *proginfo)
 
   memset((void *)silence, 0, CD_BLOCK_SIZE);
 
-  return write_n_bytes(out, silence, bytes, proginfo);
+  return write_n_bytes(out, silence, (wlong)bytes, proginfo);
 }
 
 bool read_value_long(FILE *file, unsigned long *be_val, unsigned long *le_val,

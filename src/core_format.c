@@ -279,7 +279,7 @@ static bool clobber_ask(char *filename) {
   while (1) {
     st_info("File already exists: [%s]\n", filename);
     st_info("Overwrite ([y]es, [n]o, [a]lways, ne[v]er, [r]ename)? ");
-    fgets(response, BUF_SIZE - 1, stdin);
+    (void)!fgets(response, BUF_SIZE - 1, stdin);
     if (feof(stdin))
       st_info("\n");
     trim(response);
@@ -308,7 +308,7 @@ static bool clobber_ask(char *filename) {
       strcpy(response, "");
       while (!strcmp(response, "")) {
         st_info("New name: ");
-        fgets(response, BUF_SIZE - 1, stdin);
+        (void)!fgets(response, BUF_SIZE - 1, stdin);
         trim(response);
       }
       strcpy(filename, response);
@@ -410,7 +410,7 @@ bool check_for_magic(char *filename, char *magic, int offset) {
   /* skip to magic header */
   while (bytes_to_discard > 0) {
     bytes = min(bytes_to_discard, XFER_SIZE);
-    if (bytes != fread(buf, 1, bytes, file)) {
+    if ((size_t)bytes != fread(buf, 1, bytes, file)) {
       fclose(file);
       return FALSE;
     }
@@ -418,7 +418,7 @@ bool check_for_magic(char *filename, char *magic, int offset) {
   }
 
   /* read magic header */
-  if (magiclen != fread(buf, 1, magiclen, file)) {
+  if ((size_t)magiclen != fread(buf, 1, magiclen, file)) {
     fclose(file);
     return FALSE;
   }

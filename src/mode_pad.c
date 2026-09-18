@@ -160,7 +160,7 @@ static bool pad_file(wave_info *info) {
   }
 
   if (PAD_PREPAD == pad_type) {
-    if (pad_bytes != write_padding(output, pad_bytes, &proginfo)) {
+    if ((wlong)pad_bytes != write_padding(output, pad_bytes, &proginfo)) {
       prog_error(&proginfo);
       st_warning("error while pre-padding with %d zero-bytes -- skipping.",
                  pad_bytes);
@@ -178,7 +178,7 @@ static bool pad_file(wave_info *info) {
   }
 
   if (PAD_POSTPAD == pad_type) {
-    if (pad_bytes != write_padding(output, pad_bytes, &proginfo)) {
+    if ((wlong)pad_bytes != write_padding(output, pad_bytes, &proginfo)) {
       prog_error(&proginfo);
       st_warning("error while post-padding with %d zero-bytes -- skipping",
                  pad_bytes);
@@ -196,7 +196,7 @@ static bool pad_file(wave_info *info) {
 
   if ((info->extra_riff_size > 0) &&
       (transfer_n_bytes(info->input, output, info->extra_riff_size,
-                        &proginfo) != info->extra_riff_size)) {
+                        &proginfo) != (unsigned long)info->extra_riff_size)) {
     prog_error(&proginfo);
     st_warning("error while transferring %lu extra bytes -- skipping.",
                info->extra_riff_size);

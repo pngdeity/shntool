@@ -175,7 +175,7 @@ static bool conv_file(wave_info *info) {
 
   if (PROB_EXTRA_CHUNKS(info) &&
       (transfer_n_bytes(info->input, output, info->extra_riff_size,
-                        &proginfo) != info->extra_riff_size)) {
+                        &proginfo) != (unsigned long)info->extra_riff_size)) {
     st_warning("error while transferring %lu extra bytes -- skipping.",
                info->extra_riff_size);
     goto cleanup;

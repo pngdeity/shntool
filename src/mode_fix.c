@@ -335,7 +335,7 @@ static bool write_fixed_files() {
       if (numfiles - 1 == cur_output) {
         if (pad) {
           if (pad_bytes) {
-            if (pad_bytes !=
+            if ((wlong)pad_bytes !=
                 write_padding(files[cur_output]->output, pad_bytes, NULL)) {
               prog_error(&proginfo);
               st_warning("error while padding with %d zero-bytes", pad_bytes);

@@ -143,13 +143,13 @@ static void scan_file(wave_info *info, wlong *skip_beginning, wlong *skip_end,
   do_read_cached(NULL, sample, 0, proginfo);
 
   while (bytes_remaining > 0) {
-    bytes_to_read = min(bytes_remaining, sample_size);
+    bytes_to_read = min(bytes_remaining, (wlong)sample_size);
 
     do_read_cached(info, sample, bytes_to_read, proginfo);
 
     /* compare this sample against silence (all zeroes) */
     is_silence = TRUE;
-    for (i = 0; i < bytes_to_read; i++) {
+    for (i = 0; (wlong)i < bytes_to_read; i++) {
       if (sample[i]) {
         is_silence = FALSE;
         found_noise = TRUE;
@@ -340,7 +340,7 @@ static bool trim_file(wave_info *info) {
   /* write extra riff info */
   if ((info->extra_riff_size > 0) &&
       (transfer_n_bytes(info->input, output, info->extra_riff_size,
-                        &proginfo) != info->extra_riff_size)) {
+                        &proginfo) != (unsigned long)info->extra_riff_size)) {
     prog_error(&proginfo);
     st_warning("error while transferring %lu extra bytes -- skipping.",
                info->extra_riff_size);

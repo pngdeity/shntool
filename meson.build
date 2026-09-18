@@ -5,6 +5,7 @@ project('shntool', 'c',
   default_options: [
     'c_std=gnu17',
     'warning_level=2',
+    'werror=true',
     'buildtype=debugoptimized',
     'b_ndebug=if-release',
   ],
@@ -51,6 +52,10 @@ config_h = configure_file(output: 'config.h', configuration: conf)
 # --- Compiler options --------------------------------------------------------
 
 project_args = ['-DHAVE_CONFIG_H']
+
+# The trailing child_args slots of the mode/format structs are filled in at
+# runtime and are intentionally omitted from module initializers.
+project_args += cc.get_supported_arguments(['-Wno-missing-field-initializers'])
 
 if get_option('hardening')
   project_args += cc.get_supported_arguments([

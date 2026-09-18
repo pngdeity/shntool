@@ -74,6 +74,7 @@ static void len_help() {
 }
 
 static int get_unit(char *unit) {
+  (void)unit; /* option value is read from optarg */
   if (!strcmp(optarg, "b"))
     return LEVEL_BYTES;
 

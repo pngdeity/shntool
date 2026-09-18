@@ -1,0 +1,10 @@
+version = 1
+SPDX-PackageName = "shntool"
+SPDX-PackageSupplier = "Jason Jordan <shnutils@freeshell.org>"
+SPDX-PackageDownloadLocation = "http://shnutils.freeshell.org/shntool/"
+
+[[annotations]]
+path = "**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = ["2000-2009 Jason Jordan <shnutils@freeshell.org>", "2026 pngdeity <pngdeity@tutanota.com>"]
+SPDX-License-Identifier = "GPL-2.0-or-later"

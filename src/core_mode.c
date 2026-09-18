@@ -552,30 +552,30 @@ __strverscmp (const char *s1, const char *s2)
 static weak_alias (__strverscmp, strverscmp)
 #endif
 
-static int compare_version(const wave_info **w1,const wave_info **w2)
+static int compare_version(const void *p1,const void *p2)
 {
+  const wave_info * const *w1 = p1;
+  const wave_info * const *w2 = p2;
+
   return strverscmp(w1[0]->filename,w2[0]->filename);
 }
 
-static int compare_ascii(const wave_info **w1,const wave_info **w2)
+static int compare_ascii(const void *p1,const void *p2)
 {
+  const wave_info * const *w1 = p1;
+  const wave_info * const *w2 = p2;
+
   return strcmp(w1[0]->filename,w2[0]->filename);
 }
 
 static void ascii_sort_files(wave_info **filenames, int numfiles)
 {
-  int (*cmpfunc) ();
-
-  cmpfunc = compare_ascii;
-  qsort(filenames,numfiles,sizeof(wave_info *),cmpfunc);
+  qsort(filenames,numfiles,sizeof(wave_info *),compare_ascii);
 }
 
 static void version_sort_files(wave_info **filenames,int numfiles)
 {
-  int (*cmpfunc) ();
-
-  cmpfunc = compare_version;
-  qsort(filenames,numfiles,sizeof(wave_info *),cmpfunc);
+  qsort(filenames,numfiles,sizeof(wave_info *),compare_version);
 }
 
 /* public functions */

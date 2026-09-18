@@ -45,7 +45,13 @@
 #endif
 
 /* boolean type */
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+/* bool is a built-in keyword as of C23 */
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#include <stdbool.h>
+#else
 typedef int bool;
+#endif
 
 /* wtypes */
 typedef unsigned long wlong;

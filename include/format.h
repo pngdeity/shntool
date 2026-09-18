@@ -35,7 +35,7 @@ void tagcpy(unsigned char *,unsigned char *);
 int tagcmp(unsigned char *,unsigned char *);
 
 /* function to check if a file name is about to be clobbered, and if so, asks whether this is OK */
-int clobber_check(char *);
+bool clobber_check(char *);
 
 /* find an output format module with the given name */
 format_module *find_format(char *);

@@ -78,7 +78,7 @@ void create_output_filename(char *,char *,char *);
 FILE *open_output_stream(char *,proc_info *);
 
 /* function to determine if two filenames point to the same file */
-int files_are_identical(char *,char *);
+bool files_are_identical(char *,char *);
 
 /* function to remove a file if it exists */
 void remove_file(char *);

@@ -1,0 +1,8 @@
+FILE "album.wav" WAVE
+  TRACK 01 AUDIO
+    TITLE "One"
+    PERFORMER "A"
+    INDEX 01 00:00:00
+  TRACK 02 AUDIO
+    TITLE "Two"
+    INDEX 01 00:01:00
